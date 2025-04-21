@@ -1,4 +1,3 @@
-import e from "express";
 import Maid from "../models/Maid.mjs";
 
 export const addMaid = async (req, res) => {

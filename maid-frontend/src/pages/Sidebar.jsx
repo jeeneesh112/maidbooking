@@ -18,6 +18,7 @@ import {
   Menu as MenuIcon,
 } from "@mui/icons-material";
 import { NavLink } from "react-router-dom";
+import { PersonOutline } from "@mui/icons-material";  
 
 const menuItems = [
   { text: "Dashboard", icon: <DashboardIcon />, path: "/dashboard" },
@@ -25,6 +26,7 @@ const menuItems = [
   { text: "My Bookings", icon: <BookingsIcon />, path: "/my-bookings" },
   { text: "Manage Bookings", icon: <BookingsIcon />, path: "/admin/bookings" },
   { text: "Manage Maids", icon: <CleaningIcon />, path: "/admin/maids" },
+  {text : "Profile", icon: <PersonOutline />, path: "/profile"},
 ];
 
 const Sidebar = () => {

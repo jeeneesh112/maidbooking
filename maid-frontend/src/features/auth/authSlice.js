@@ -16,6 +16,7 @@ const authSlice = createSlice({
     loading: false,
     error: null,
     otpPhase: false,
+    apiresponse: null,
   },
   reducers: {
     logout: (state) => {
@@ -23,6 +24,9 @@ const authSlice = createSlice({
       state.token = null;
       state.isAuthenticated = false;
       state.user = null;
+    },
+    clearError: (state) => {
+      state.error = null;
     },
   },
   extraReducers: (builder) => {
@@ -39,10 +43,18 @@ const authSlice = createSlice({
         state.error = action.error.message;
       })
 
-      .addCase(login.fulfilled, (state) => {
+      .addCase(login.fulfilled, (state,action) => {
         state.otpPhase = true;
         state.loading = false;
+        localStorage.setItem('userId', action.payload.userId);
       })
+
+      .addCase(login.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message; // This now contains the actual error message
+      })
+      
+      
 
       .addCase(verifyOtp.fulfilled, (state, action) => {
         state.token = action.payload.token;
@@ -50,7 +62,12 @@ const authSlice = createSlice({
         state.isAuthenticated = true;
         state.otpPhase = false;
         localStorage.setItem('token', action.payload.token);
-      });
+      })
+
+      .addCase(verifyOtp.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message; // This now contains the actual error message
+      })
   },
 });
 

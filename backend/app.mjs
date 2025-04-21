@@ -6,6 +6,7 @@ import mongoose from 'mongoose';
 
 import authRoutes from './routes/authRoutes.mjs';
 import maidRoutes from './routes/maidRoutes.mjs';
+import profileRoutes from './routes/profileRoutes.mjs';
 // import bookingRoutes from './routes/bookingRoutes.mjs';
 
 dotenv.config();
@@ -18,6 +19,7 @@ app.use(morgan('dev'));
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/maid', maidRoutes);
+app.use('/api/profile',profileRoutes);
 // app.use('/api/book', bookingRoutes);
 
 // DB

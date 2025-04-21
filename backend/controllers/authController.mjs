@@ -33,8 +33,8 @@ export const signup = async (req, res) => {
 }
 
 export const login = async (req, res) => {
-    const { email, password } = req.body;
-    const userData = await User.findOne({ email });
+    const { mobile, password } = req.body;
+    const userData = await User.findOne({ mobile });
 
     if (!userData) {
         return res.status(400).json({ message: 'User not found' });
@@ -43,7 +43,7 @@ export const login = async (req, res) => {
     const isPasswordValid = await bcrypt.compare(password, userData.password);
 
     if (!isPasswordValid) {
-        return res.status(400).json({ message: 'Invalid credentials' });
+        return res.status(400).json({ message: 'Invalid password' });
     }
 
     res.status(200).json({ message: 'OTP sent', userId: userData._id });

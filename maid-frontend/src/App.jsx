@@ -10,6 +10,7 @@ import ManageBookings from "./pages/ManageBookings";
 import PrivateRoute from "./utils/PrivateRoute";
 import EditMaid from "./pages/EditMaid";
 import Sidebar from "./pages/Sidebar";
+import Profile from "./pages/Profile";
 
 const App = () => {
   return (
@@ -22,52 +23,61 @@ const App = () => {
 
       <Route
         element={
-          // <PrivateRoute>
+          <PrivateRoute>
             <Sidebar />
-          // </PrivateRoute>
+           </PrivateRoute>
         }
       >
       <Route
         path="/dashboard"
         element={
-          // <PrivateRoute>
+          <PrivateRoute>
             <Dashboard />
-          // </PrivateRoute>
+         </PrivateRoute>
+        }
+      />
+        <Route
+        path="/profile"
+        element={
+          <PrivateRoute>
+            <Profile />
+         </PrivateRoute>
         }
       />
       <Route
         path="/admin"
         element={
-          // <PrivateRoute>
+           <PrivateRoute>
             <AdminDashboard />
-          // </PrivateRoute>
+           </PrivateRoute>
         }
       />
       <Route
         path="/admin/maids"
         element={
-          // <PrivateRoute>
+           <PrivateRoute>
             <AddMaid />
-          // </PrivateRoute>
+           </PrivateRoute>
         }
       />
       <Route
         path="/admin/bookings"
         element={
-          // <PrivateRoute>
+           <PrivateRoute>
             <ManageBookings />
-          // </PrivateRoute>
+           </PrivateRoute>
         }
       />
       <Route
         path="/admin/maids/edit/:maidId"
         element={
-          // <PrivateRoute>
+           <PrivateRoute>
             <EditMaid />
-          // </PrivateRoute>
+           </PrivateRoute>
         }
       />
       </Route>
+      
     </Routes>
   );
 };

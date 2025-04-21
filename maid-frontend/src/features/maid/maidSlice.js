@@ -1,8 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import * as maidAPI from './maidAPI';   
 
-const token = localStorage.getItem('token');
-
 export const fetchMaid = createAsyncThunk('maid/fetchMaid', maidAPI.getMaidsByArea);
 export const fetchMaidById = createAsyncThunk('maid/fetchMaidById', maidAPI.getMaid);
 export const createMaid = createAsyncThunk('maid/createMaid', maidAPI.addMaid);
