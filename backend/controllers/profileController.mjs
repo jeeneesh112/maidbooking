@@ -1,6 +1,6 @@
 import User from "../models/Users.mjs";
 
-export const userInfobyId = async (req, res) => {
+export const userInfo = async (req, res) => {
     const { id } = req.body;
     try {
         const user = await User.findById(id);
