@@ -5,8 +5,14 @@ const API = axios.create({
 });
 
 export const signup = async (data) => {
-  const res = await API.post('/auth/signup', data);
-  return res.data;
+  try{
+    console.log('Data in API:', data);
+    const res = await API.post('/auth/signup', data);
+    return res.data;
+  } catch (error) {
+    const message = error.response?.data?.message || 'Signup failed';
+    throw new Error(message);
+  }
 };
 
 export const login = async (data) => {
