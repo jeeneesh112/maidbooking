@@ -20,6 +20,7 @@ import {
   DialogContent,
   DialogActions,
   Divider,
+  InputLabel,
 } from "@mui/material";
 import { Edit, Delete } from "@mui/icons-material";
 import { useDispatch, useSelector } from "react-redux";
@@ -56,8 +57,8 @@ const AddMaid = () => {
     e.preventDefault();
     try {
       dispatch(createMaid({ ...maidData, id: Date.now() }));
-      setSnackbarMessage("Maid added successfully!");
-      setSnackbarOpen(true);
+      // setSnackbarMessage("Maid added successfully!");
+      // setSnackbarOpen(true);
       setMaidData({
         name: "",
         mobile: "",
@@ -165,152 +166,149 @@ const AddMaid = () => {
         )}
       </Paper>
 
-      {/* <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
-        <Box
-          component={Paper}
-          elevation={6}
-          sx={{
-            maxWidth: 600,
-            mx: 'auto',
-            mt: '10vh',
-            p: 4,
-            outline: 'none',
-          }}
-        >
-          <Typography variant="h6" gutterBottom fontWeight="bold">
+      <Dialog
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        fullWidth
+        maxWidth="sm"
+      >
+        <DialogContent sx={{ padding: "24px 80px" }}>
+          <Typography
+            variant="h5"
+            align="center"
+            sx={{ marginBottom: "24px", fontWeight: "bold" }}
+          >
             Add New Maid
           </Typography>
-          <form onSubmit={handleSubmit}>
-            <Grid container spacing={2}>
-              {[
-                { label: 'Name', name: 'name' },
-                { label: 'Mobile', name: 'mobile' },
-                { label: 'Picture URL', name: 'pic' },
-                { label: 'City', name: 'city' },
-                { label: 'State', name: 'state' },
-                { label: 'Area', name: 'area' },
-                { label: 'Pincode', name: 'pincode' },
-                { label: 'Salary', name: 'salary' },
-              ].map((field) => (
-                <Grid item xs={12} key={field.name}>
-                  <TextField
-                    label={field.label}
-                    name={field.name}
-                    value={maidData[field.name]}
-                    onChange={handleChange}
-                    fullWidth
+          <Divider
+            sx={{
+              borderBottomWidth: 2,
+              borderColor: "#FFA000",
+              width: "100%",
+              margin: "0 auto 24px",
+            }}
+          />
+          <form noValidate autoComplete="off" onSubmit={handleSubmit}>
+            <Grid container spacing={3}>
+              <Grid item xs={6}>
+                <TextField
+                  label="Full Name"
+                  name="name"
+                  fullWidth
+                  value={maidData.name}
+                  onChange={handleChange}
+                  size="small"
+                />
+              </Grid>
+              <Grid item xs={6}>
+                <TextField
+                  label="Mobile Number"
+                  name="mobile"
+                  fullWidth
+                  value={maidData.mobile}
+                  onChange={handleChange}
+                  size="small"
+                />
+              </Grid>
+              <Grid item xs={6}>
+                <TextField
+                  label="Picture URL"
+                  name="pic"
+                  fullWidth
+                  value={maidData.pic}
+                  onChange={handleChange}
+                  size="small"
+                />
+              </Grid>
+              <Grid item xs={6}>
+                <TextField
+                  label="City"
+                  name="city"
+                  fullWidth
+                  value={maidData.city}
+                  onChange={handleChange}
+                  size="small"
+                />
+              </Grid>
+              <Grid item xs={6}>
+                <TextField
+                  label="State"
+                  name="state"
+                  fullWidth
+                  value={maidData.state}
+                  onChange={handleChange}
+                  size="small"
+                />
+              </Grid>
+              <Grid item xs={6}>
+                <TextField
+                  label="Area/Locality"
+                  name="area"
+                  fullWidth
+                  value={maidData.area}
+                  onChange={handleChange}
+                  size="small"
+                />
+              </Grid>
+              <Grid item xs={6}>
+                <TextField
+                  label="Pincode"
+                  name="pincode"
+                  fullWidth
+                  value={maidData.pincode}
+                  onChange={handleChange}
+                  size="small"
+                />
+              </Grid>
+              <Grid item xs={6}>
+                <TextField
+                  label="Expected Salary (₹)"
+                  name="salary"
+                  fullWidth
+                  value={maidData.salary}
+                  onChange={handleChange}
+                  size="small"
+                />
+              </Grid>
+              <Grid item xs={12} sx={{ mt: 2 }}>
+                <Box display="flex" justifyContent={ "flex-end" } gap={2}>
+                  <Button
                     variant="outlined"
-                  />
-                </Grid>
-              ))}
-              <Grid item xs={12}>
-                <Button type="submit" variant="contained" fullWidth>
-                  Add Maid
-                </Button>
+                    onClick={() => setModalOpen(false)}
+                    sx={{
+                      color: "#555",
+                      borderColor: "#ccc",
+                      fontSize: "0.875rem",
+                      textTransform: "none",
+                      "&:hover": {
+                        borderColor: "#999",
+                        backgroundColor: "#f5f5f5",
+                      },
+                    }}
+                  >
+                    Close
+                  </Button>
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    sx={{
+                      backgroundColor: "#FFA000",
+                      color: "#fff",
+                      fontSize: "0.875rem",
+                      textTransform: "none",
+                      "&:hover": {
+                        backgroundColor: "#FF8F00",
+                      },
+                    }}
+                  >
+                    Add Maid
+                  </Button>
+                </Box>
               </Grid>
             </Grid>
           </form>
-        </Box>
-      </Modal> */}
-
-<Dialog
-  open={modalOpen}
-  onClose={() => setModalOpen(false)}
-  fullWidth
-  maxWidth="sm"
-  PaperProps={{
-    sx: {
-      backgroundColor: '#fffdf5', // very light yellow
-      p: 3,
-    },
-  }}
->
-  <DialogTitle
-    sx={{
-      textAlign: 'center',
-      fontWeight: 'bold',
-      fontSize: '1.5rem',
-      color: '#FFA000',
-      pb: 1,
-    }}
-  >
-    Add New Maid
-  </DialogTitle>
-
-  <Divider sx={{ mb: 2 }} />
-
-  <DialogContent sx={{ px: 1 }}>
-    <form id="add-maid-form" onSubmit={handleSubmit}>
-      <Grid container spacing={3}>
-        {[
-          { label: 'Name', name: 'name' },
-          { label: 'Mobile', name: 'mobile' },
-          { label: 'Picture URL', name: 'pic' },
-          { label: 'City', name: 'city' },
-          { label: 'State', name: 'state' },
-          { label: 'Area', name: 'area' },
-          { label: 'Pincode', name: 'pincode' },
-          { label: 'Salary', name: 'salary' },
-        ].map((field) => (
-          <Grid item xs={12} sm={6} key={field.name}>
-            <Typography
-              variant="subtitle2"
-              sx={{ mb: 0.5, fontWeight: 500, color: '#444' }}
-            >
-              {field.label}
-            </Typography>
-            <TextField
-              name={field.name}
-              value={maidData[field.name]}
-              onChange={handleChange}
-              fullWidth
-              variant="outlined"
-              size="small"
-            />
-          </Grid>
-        ))}
-      </Grid>
-    </form>
-  </DialogContent>
-
-  <DialogActions
-    sx={{
-      justifyContent: 'center',
-      pt: 2,
-    }}
-  >
-    <Button
-      onClick={() => setModalOpen(false)}
-      variant="outlined"
-      sx={{
-        borderColor: '#FFA000',
-        color: '#FFA000',
-        '&:hover': {
-          backgroundColor: '#ffe0a3',
-          borderColor: '#FFA000',
-        },
-      }}
-    >
-      Cancel
-    </Button>
-    <Button
-      type="submit"
-      form="add-maid-form"
-      variant="contained"
-      sx={{
-        backgroundColor: '#FFA000',
-        color: '#fff',
-        '&:hover': {
-          backgroundColor: '#e38e00',
-        },
-        ml: 2,
-      }}
-    >
-      Add Maid
-    </Button>
-  </DialogActions>
-</Dialog>
-
+        </DialogContent>
+      </Dialog>
 
       <Snackbar
         open={snackbarOpen}
