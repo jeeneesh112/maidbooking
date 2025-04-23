@@ -13,12 +13,10 @@ const TokenExpiryWatcher = () => {
   useEffect(() => {
     if (!isAuthenticated || !tokenIssuedAt) return;
 
-    const oneHour = 1 * 60 * 1000;
+    const oneHour = 60 * 60 * 1000;
     const expiryTime = tokenIssuedAt + oneHour;
     const now = Date.now();
     const remainingTime = expiryTime - now;
-
-    console.log("TokenExpiryWatcher - remainingTime:", remainingTime);
 
     if (remainingTime <= 0) {
         console.log("Token expired, logging out...");

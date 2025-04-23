@@ -46,8 +46,6 @@ const AddMaid = () => {
   const { userData } = useSelector((state) => state.profile);
   const { token } = useSelector((state) => state.auth);
 
-  console.log("User Data:", userData);
-
   useEffect(() => {
     if (token) {
       const body = {
