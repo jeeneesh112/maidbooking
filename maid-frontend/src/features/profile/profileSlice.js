@@ -55,7 +55,7 @@ const profileSlice = createSlice({
           state.error = "Received empty profile data";
           return;
         }
-        const { password, __v, createdAt, updatedAt, ...userData } = action.payload;
+        const { ...userData } = action.payload;
 
         state.userData = userData; // Store cleaned data
       })

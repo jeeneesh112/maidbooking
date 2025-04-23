@@ -9,10 +9,11 @@ import {
 
 import { verifyToken } from '../middleware/authMiddleware.mjs';
 import { isAdmin } from '../middleware/roleMiddleware.mjs';
+import {authorizeRoles} from '../middleware/authorizeRoles.mjs';
 
 const router = express.Router();
 
-router.post('/add', verifyToken, isAdmin, addMaid);
+router.post('/add', verifyToken, authorizeRoles("add_maid"), addMaid);
 router.post('/get_by_area', verifyToken, getMaidsByArea);
 router.post('/get_by_id', verifyToken, getMaidById);
 router.post('/delete', verifyToken, isAdmin, deleteMaid);

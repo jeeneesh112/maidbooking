@@ -12,7 +12,6 @@ const maidSchema = new mongoose.Schema({
     },
     picture : {
         type: String,
-        required: true,
     },
     state : {
         type: String,

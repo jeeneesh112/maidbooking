@@ -19,19 +19,34 @@ import {
 } from "@mui/icons-material";
 import { NavLink } from "react-router-dom";
 import { PersonOutline } from "@mui/icons-material";  
+import { useSelector } from "react-redux";
 
 const menuItems = [
-  { text: "Dashboard", icon: <DashboardIcon />, path: "/dashboard" },
-  { text: "Book a Maid", icon: <CleaningIcon />, path: "/book-maid" },
-  { text: "My Bookings", icon: <BookingsIcon />, path: "/my-bookings" },
-  { text: "Manage Bookings", icon: <BookingsIcon />, path: "/admin/bookings" },
-  { text: "Manage Maids", icon: <CleaningIcon />, path: "/admin/maids" },
-  {text : "Profile", icon: <PersonOutline />, path: "/profile"},
+  { text: "Dashboard", icon: <DashboardIcon />, path: "/dashboard" , roles: ["view_dashboard"]},
+  { text: "Book a Maid", icon: <CleaningIcon />, path: "/book-maid", roles: ["book_maid"]},
+  { text: "My Bookings", icon: <BookingsIcon />, path: "/my-bookings", roles: ["view_bookings"]},
+  { text: "Manage Bookings", icon: <BookingsIcon />, path: "/admin/bookings" , roles: ["manage_bookings"]},
+  { text: "Manage Maids", icon: <CleaningIcon />, path: "/admin/maids" , roles: ["manage_maids"]},
+  {text : "Profile", icon: <PersonOutline />, path: "/profile",roles: ["view_profile"],},
 ];
 
 const Sidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
   const location = useLocation();
+
+  // const { userData } = useSelector((state) => state.profile);
+  const {user} = useSelector((state) => state.auth);
+  const userRoles = user?.roles || [];
+  const isSuperAdmin = user?.userType === "superadmin";
+
+  console.log("userRoles:", userRoles);
+  console.log("isSuperAdmin:", isSuperAdmin);
+
+  const filteredMenuItems = menuItems.filter((item) => {
+    return isSuperAdmin || item?.roles?.some((role) => userRoles.includes(role));
+  });
+
+  console.log("filteredMenuItems:", filteredMenuItems);
 
   return (
     <Box
@@ -114,7 +129,7 @@ const Sidebar = () => {
         )}
 
         <List sx={{ width: "100%" }}>
-          {menuItems.map((item) => {
+          {filteredMenuItems.map((item) => {
             const isActive = location.pathname === item.path;
 
             return (

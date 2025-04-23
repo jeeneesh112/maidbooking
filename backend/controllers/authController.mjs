@@ -55,7 +55,25 @@ export const verifyOtp = async (req, res) => {
     if (otp !== '1234') return res.status(400).json({ message: 'Invalid OTP' });
 
     const userData = await User.findById(userId);
-    const token = jwt.sign({ id: userData._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
-    res.status(200).json({ message: 'Login successful', token });
+    const user = {
+        name: userData.name,
+        email: userData.email,
+        mobile: userData.mobile,
+        city: userData.city,
+        area: userData.area,
+        state: userData.state,
+        pincode: userData.pincode,
+        pic: userData.pic,
+        userType: userData.userType,
+        roles: userData.roles,
+    }
+
+    const token = jwt.sign({ id: userData._id,
+        userType : userData.userType,
+        roles : userData.roles,
+        name : userData.name,
+     }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+    res.status(200).json({ message: 'Login successful', token, user });
 }

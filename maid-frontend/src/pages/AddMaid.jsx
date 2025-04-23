@@ -14,17 +14,14 @@ import {
   TableBody,
   IconButton,
   CircularProgress,
-  Modal,
   Dialog,
-  DialogTitle,
   DialogContent,
-  DialogActions,
   Divider,
-  InputLabel,
 } from "@mui/material";
 import { Edit, Delete } from "@mui/icons-material";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchMaid, createMaid, deleteMaid } from "../features/maid/maidSlice";
+import CloseIcon from "@mui/icons-material/Close";
 
 const AddMaid = () => {
   const [maidData, setMaidData] = useState({
@@ -43,11 +40,24 @@ const AddMaid = () => {
   const [modalOpen, setModalOpen] = useState(false);
 
   const dispatch = useDispatch();
-  const { maids, loading } = useSelector((state) => state.maid);
+  const { maids, loading, maidCreated, error } = useSelector(
+    (state) => state.maid
+  );
+  const { userData } = useSelector((state) => state.profile);
+  const { token } = useSelector((state) => state.auth);
+
+  console.log("User Data:", userData);
 
   useEffect(() => {
-    dispatch(fetchMaid());
-  }, [dispatch]);
+    if (token) {
+      const body = {
+        area: userData?.area,
+        page: 1,
+        limit: 10,
+      };
+      dispatch(fetchMaid(body));
+    }
+  }, [dispatch, token, userData,maidCreated]);
 
   const handleChange = (e) => {
     setMaidData({ ...maidData, [e.target.name]: e.target.value });
@@ -55,25 +65,18 @@ const AddMaid = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      dispatch(createMaid({ ...maidData, id: Date.now() }));
-      // setSnackbarMessage("Maid added successfully!");
-      // setSnackbarOpen(true);
-      setMaidData({
-        name: "",
-        mobile: "",
-        pic: "",
-        city: "",
-        state: "",
-        area: "",
-        pincode: "",
-        salary: "",
-      });
-      setModalOpen(false);
-    } catch (err) {
-      setSnackbarMessage("Failed to add maid.");
-      setSnackbarOpen(true);
-    }
+    dispatch(createMaid({ ...maidData, id: Date.now() }));
+    setMaidData({
+      name: "",
+      mobile: "",
+      pic: "",
+      city: "",
+      state: "",
+      area: "",
+      pincode: "",
+      salary: "",
+    });
+    setModalOpen(false);
   };
 
   const handleDelete = (id) => {
@@ -83,240 +86,271 @@ const AddMaid = () => {
   };
 
   return (
-    <Box
-      sx={{
-        flexGrow: 1,
-        p: 3,
-        backgroundColor: "#fffdf5",
-        minHeight: "100vh",
-        maxWidth: "100vw",
-        minWidth: "80vw",
-      }}
-    >
+    <>
       <Box
         sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          mb: 2,
-          alignItems: "center",
+          flexGrow: 1,
+          p: 3,
+          backgroundColor: "#fffdf5",
+          minHeight: "100vh",
+          maxWidth: "100vw",
+          minWidth: "80vw",
         }}
       >
-        <Typography variant="h5" fontWeight="bold">
-          Maid List
-        </Typography>
-        <Button
-          variant="contained"
+        <Box
           sx={{
-            backgroundColor: "#FFA000",
-            color: "#fff",
+            display: "flex",
+            justifyContent: "space-between",
+            mb: 2,
+            alignItems: "center",
           }}
-          onClick={() => setModalOpen(true)}
         >
-          Add Maid
-        </Button>
-      </Box>
-
-      <Paper elevation={2} sx={{ width: "100%", overflowX: "auto" }}>
-        {loading ? (
-          <Box sx={{ p: 3 }}>
-            <CircularProgress />
-          </Box>
-        ) : (
-          <Table>
-            <TableHead sx={{ backgroundColor: "#fff3e0" }}>
-              {" "}
-              {/* soft orange */}
-              <TableRow>
-                <TableCell>Name</TableCell>
-                <TableCell>Mobile</TableCell>
-                <TableCell>Area</TableCell>
-                <TableCell>City</TableCell>
-                <TableCell>State</TableCell>
-                <TableCell>Salary</TableCell>
-                <TableCell align="right">Actions</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {maids.map((maid) => (
-                <TableRow key={maid.id} hover>
-                  <TableCell>{maid.name}</TableCell>
-                  <TableCell>{maid.mobile}</TableCell>
-                  <TableCell>{maid.area}</TableCell>
-                  <TableCell>{maid.city}</TableCell>
-                  <TableCell>{maid.state}</TableCell>
-                  <TableCell>{maid.salary}</TableCell>
-                  <TableCell align="right">
-                    <IconButton
-                      color="primary"
-                      onClick={() => alert("Edit logic")}
-                    >
-                      <Edit />
-                    </IconButton>
-                    <IconButton
-                      color="error"
-                      onClick={() => handleDelete(maid.id)}
-                    >
-                      <Delete />
-                    </IconButton>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        )}
-      </Paper>
-
-      <Dialog
-        open={modalOpen}
-        onClose={() => setModalOpen(false)}
-        fullWidth
-        maxWidth="sm"
-      >
-        <DialogContent sx={{ padding: "24px 80px" }}>
-          <Typography
-            variant="h5"
-            align="center"
-            sx={{ marginBottom: "24px", fontWeight: "bold" }}
-          >
-            Add New Maid
+          <Typography variant="h5" fontWeight="bold">
+            Maid List
           </Typography>
-          <Divider
+          <Button
+            variant="contained"
             sx={{
-              borderBottomWidth: 2,
-              borderColor: "#FFA000",
-              width: "100%",
-              margin: "0 auto 24px",
+              backgroundColor: "#FFA000",
+              color: "#fff",
             }}
-          />
-          <form noValidate autoComplete="off" onSubmit={handleSubmit}>
-            <Grid container spacing={3}>
-              <Grid item xs={6}>
-                <TextField
-                  label="Full Name"
-                  name="name"
-                  fullWidth
-                  value={maidData.name}
-                  onChange={handleChange}
-                  size="small"
-                />
-              </Grid>
-              <Grid item xs={6}>
-                <TextField
-                  label="Mobile Number"
-                  name="mobile"
-                  fullWidth
-                  value={maidData.mobile}
-                  onChange={handleChange}
-                  size="small"
-                />
-              </Grid>
-              <Grid item xs={6}>
-                <TextField
-                  label="Picture URL"
-                  name="pic"
-                  fullWidth
-                  value={maidData.pic}
-                  onChange={handleChange}
-                  size="small"
-                />
-              </Grid>
-              <Grid item xs={6}>
-                <TextField
-                  label="City"
-                  name="city"
-                  fullWidth
-                  value={maidData.city}
-                  onChange={handleChange}
-                  size="small"
-                />
-              </Grid>
-              <Grid item xs={6}>
-                <TextField
-                  label="State"
-                  name="state"
-                  fullWidth
-                  value={maidData.state}
-                  onChange={handleChange}
-                  size="small"
-                />
-              </Grid>
-              <Grid item xs={6}>
-                <TextField
-                  label="Area/Locality"
-                  name="area"
-                  fullWidth
-                  value={maidData.area}
-                  onChange={handleChange}
-                  size="small"
-                />
-              </Grid>
-              <Grid item xs={6}>
-                <TextField
-                  label="Pincode"
-                  name="pincode"
-                  fullWidth
-                  value={maidData.pincode}
-                  onChange={handleChange}
-                  size="small"
-                />
-              </Grid>
-              <Grid item xs={6}>
-                <TextField
-                  label="Expected Salary (₹)"
-                  name="salary"
-                  fullWidth
-                  value={maidData.salary}
-                  onChange={handleChange}
-                  size="small"
-                />
-              </Grid>
-              <Grid item xs={12} sx={{ mt: 2 }}>
-                <Box display="flex" justifyContent={ "flex-end" } gap={2}>
-                  <Button
-                    variant="outlined"
-                    onClick={() => setModalOpen(false)}
-                    sx={{
-                      color: "#555",
-                      borderColor: "#ccc",
-                      fontSize: "0.875rem",
-                      textTransform: "none",
-                      "&:hover": {
-                        borderColor: "#999",
-                        backgroundColor: "#f5f5f5",
-                      },
-                    }}
-                  >
-                    Close
-                  </Button>
-                  <Button
-                    type="submit"
-                    variant="contained"
-                    sx={{
-                      backgroundColor: "#FFA000",
-                      color: "#fff",
-                      fontSize: "0.875rem",
-                      textTransform: "none",
-                      "&:hover": {
-                        backgroundColor: "#FF8F00",
-                      },
-                    }}
-                  >
-                    Add Maid
-                  </Button>
-                </Box>
-              </Grid>
-            </Grid>
-          </form>
-        </DialogContent>
-      </Dialog>
+            onClick={() => setModalOpen(true)}
+          >
+            Add Maid
+          </Button>
+        </Box>
 
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={4000}
-        onClose={() => setSnackbarOpen(false)}
-        message={snackbarMessage}
-      />
-    </Box>
+        <Paper elevation={2} sx={{ width: "100%", overflowX: "auto" }}>
+          {loading ? (
+            <Box sx={{ p: 3 }}>
+              <CircularProgress />
+            </Box>
+          ) : (
+            <Table>
+              {maids?.maids?.length === 0 && (
+                <TableBody>
+                  <TableRow>
+                    <TableCell colSpan={7} align="center">
+                      <Typography variant="h6" color="text.secondary">
+                        No maids found.
+                      </Typography>
+                    </TableCell>
+                  </TableRow>
+                </TableBody>
+              )}
+
+              <TableHead sx={{ backgroundColor: "#fff3e0" }}>
+                {" "}
+                <TableRow>
+                  <TableCell>Name</TableCell>
+                  <TableCell>Mobile</TableCell>
+                  <TableCell>Area</TableCell>
+                  <TableCell>City</TableCell>
+                  <TableCell>State</TableCell>
+                  <TableCell>Salary</TableCell>
+                  <TableCell align="right">Actions</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {maids?.maids?.map((maid) => (
+                  <TableRow key={maid?.id} hover>
+                    <TableCell>{maid?.name}</TableCell>
+                    <TableCell>{maid?.mobile}</TableCell>
+                    <TableCell>{maid?.area}</TableCell>
+                    <TableCell>{maid?.city}</TableCell>
+                    <TableCell>{maid?.state}</TableCell>
+                    <TableCell>{maid?.salaryPerMonth}</TableCell>
+                    <TableCell align="right">
+                      <IconButton
+                        color="primary"
+                        onClick={() => alert("Edit logic")}
+                      >
+                        <Edit />
+                      </IconButton>
+                      <IconButton
+                        color="error"
+                        onClick={() => handleDelete(maid.id)}
+                      >
+                        <Delete />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </Paper>
+
+        <Dialog
+          open={modalOpen}
+          onClose={() => setModalOpen(false)}
+          fullWidth
+          maxWidth="sm"
+        >
+          <DialogContent sx={{ padding: "24px 80px" }}>
+            <Typography
+              variant="h5"
+              align="center"
+              sx={{ marginBottom: "24px", fontWeight: "bold" }}
+            >
+              Add New Maid
+            </Typography>
+            <Divider
+              sx={{
+                borderBottomWidth: 2,
+                borderColor: "#FFA000",
+                width: "100%",
+                margin: "0 auto 24px",
+              }}
+            />
+            <form noValidate autoComplete="off" onSubmit={handleSubmit}>
+              <Grid container spacing={3}>
+                <Grid item xs={6}>
+                  <TextField
+                    label="Full Name"
+                    name="name"
+                    fullWidth
+                    value={maidData.name}
+                    onChange={handleChange}
+                    size="small"
+                  />
+                </Grid>
+                <Grid item xs={6}>
+                  <TextField
+                    label="Mobile Number"
+                    name="mobile"
+                    fullWidth
+                    value={maidData.mobile}
+                    onChange={handleChange}
+                    size="small"
+                  />
+                </Grid>
+                <Grid item xs={6}>
+                  <TextField
+                    label="Picture URL"
+                    name="pic"
+                    fullWidth
+                    value={maidData.pic}
+                    onChange={handleChange}
+                    size="small"
+                  />
+                </Grid>
+                <Grid item xs={6}>
+                  <TextField
+                    label="City"
+                    name="city"
+                    fullWidth
+                    value={maidData.city}
+                    onChange={handleChange}
+                    size="small"
+                  />
+                </Grid>
+                <Grid item xs={6}>
+                  <TextField
+                    label="State"
+                    name="state"
+                    fullWidth
+                    value={maidData.state}
+                    onChange={handleChange}
+                    size="small"
+                  />
+                </Grid>
+                <Grid item xs={6}>
+                  <TextField
+                    label="Area/Locality"
+                    name="area"
+                    fullWidth
+                    value={maidData.area}
+                    onChange={handleChange}
+                    size="small"
+                  />
+                </Grid>
+                <Grid item xs={6}>
+                  <TextField
+                    label="Pincode"
+                    name="pincode"
+                    fullWidth
+                    value={maidData.pincode}
+                    onChange={handleChange}
+                    size="small"
+                  />
+                </Grid>
+                <Grid item xs={6}>
+                  <TextField
+                    label="Expected Salary (₹)"
+                    name="salary"
+                    fullWidth
+                    value={maidData.salary}
+                    onChange={handleChange}
+                    size="small"
+                  />
+                </Grid>
+                <Grid item xs={12} sx={{ mt: 2 }}>
+                  <Box display="flex" justifyContent={"flex-end"} gap={2}>
+                    <Button
+                      variant="outlined"
+                      onClick={() => setModalOpen(false)}
+                      sx={{
+                        color: "#555",
+                        borderColor: "#ccc",
+                        fontSize: "0.875rem",
+                        textTransform: "none",
+                        "&:hover": {
+                          borderColor: "#999",
+                          backgroundColor: "#f5f5f5",
+                        },
+                      }}
+                    >
+                      Close
+                    </Button>
+                    <Button
+                      type="submit"
+                      variant="contained"
+                      sx={{
+                        backgroundColor: "#FFA000",
+                        color: "#fff",
+                        fontSize: "0.875rem",
+                        textTransform: "none",
+                        "&:hover": {
+                          backgroundColor: "#FF8F00",
+                        },
+                      }}
+                    >
+                      Add Maid
+                    </Button>
+                  </Box>
+                </Grid>
+              </Grid>
+            </form>
+          </DialogContent>
+        </Dialog>
+
+        <Snackbar
+          open={snackbarOpen}
+          autoHideDuration={4000}
+          onClose={() => setSnackbarOpen(false)}
+          message={snackbarMessage}
+        />
+      </Box>
+      {error && (
+        <Snackbar
+          open={!!error}
+          autoHideDuration={6000}
+          onClose={() => dispatch({ type: "maid/clearError" })}
+          message={error}
+          action={
+            <IconButton
+              size="small"
+              aria-label="close"
+              color="inherit"
+              onClick={() => dispatch({ type: "maid/clearError" })}
+            >
+              <CloseIcon fontSize="small" />
+            </IconButton>
+          }
+        />
+      )}
+    </>
   );
 };
 
