@@ -52,8 +52,6 @@ export const getMaidsByArea = async (req, res) => {
       maids,
     });
   };
-  
-  
 
 export const getMaidById = async (req, res) => {
     const { id } = req.body;
@@ -72,8 +70,10 @@ export const getMaidById = async (req, res) => {
 export const deleteMaid = async (req, res) => {
     const { id } = req.body;
 
+    console.log("Deleting Maid ID:", id);
+
     try {
-        const maid = await Maid.findById(id);
+        const maid = await Maid.findById( id );
         if (!maid) {
             return res.status(404).json({ message: "Maid not found" });
         }

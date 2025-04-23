@@ -13,10 +13,10 @@ import {authorizeRoles} from '../middleware/authorizeRoles.mjs';
 
 const router = express.Router();
 
-router.post('/add', verifyToken, authorizeRoles("add_maid"), addMaid);
-router.post('/get_by_area', verifyToken, getMaidsByArea);
+router.post('/add', verifyToken, authorizeRoles("manage_maids"), addMaid);
+router.post('/get_by_area', verifyToken,authorizeRoles("manage_maids"), getMaidsByArea);
 router.post('/get_by_id', verifyToken, getMaidById);
-router.post('/delete', verifyToken, isAdmin, deleteMaid);
+router.post('/delete', verifyToken, authorizeRoles("manage_maids"), deleteMaid);
 router.post('/update', verifyToken, isAdmin, updateMaid);
 
 

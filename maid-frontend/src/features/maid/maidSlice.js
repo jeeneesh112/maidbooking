@@ -50,6 +50,28 @@ export const createMaid = createAsyncThunk(
   }
 );
 
+export const deleteMaid = createAsyncThunk(
+  "maid/deleteMaid",
+  async (id, { getState, rejectWithValue }) => {
+    const { token } = getState().auth;
+    console.log("deleteMaid maidId:", id);
+    try {
+      const data = await maidAPI.deleteMaid({id : id}, token);
+      return data;
+    } catch (err) {
+      if (err.response?.data) {
+        return rejectWithValue(
+          err.response.data.message || "Something went wrong"
+        );
+      }
+      return rejectWithValue(
+        err.message || "Network error: Please try again later"
+      );
+    }
+  }
+);
+
+
 export const fetchMaidById = createAsyncThunk(
   "maid/fetchMaidById",
   maidAPI.getMaid
@@ -59,27 +81,16 @@ export const updateMaid = createAsyncThunk(
   "maid/updateMaid",
   maidAPI.updateMaid
 );
-export const deleteMaid = createAsyncThunk(
-  "maid/deleteMaid",
-  maidAPI.deleteMaid
-);
+// export const deleteMaid = createAsyncThunk(
+//   "maid/deleteMaid",
+//   maidAPI.deleteMaid
+// );
 // export const fetchMaidByUserId = createAsyncThunk('maid/fetchMaidByUserId', maidAPI.fetchMaidByUserId);
 
 const maidSlice = createSlice({
   name: "maid",
   initialState: {
-    maids: [
-      {
-        id: 1,
-        name: "Rani Sharma",
-        mobile: "9876543210",
-        city: "Delhi",
-        state: "Delhi",
-        area: "Lajpat Nagar",
-        pincode: "110024",
-        salary: "15000",
-      },
-    ],
+    maids: [],
     maid: null,
     loading: false,
     error: null,
@@ -127,7 +138,7 @@ const maidSlice = createSlice({
       .addCase(createMaid.fulfilled, (state, action) => {
         state.loading = false;
         state.maidCreated = true;
-        state.maids.push(action.payload);
+        state.maids.maids.push(action.payload);
       })
       .addCase(createMaid.rejected, (state, action) => {
         console.error("Error in createMaid...action:", action);
@@ -155,10 +166,11 @@ const maidSlice = createSlice({
         state.loading = true;
       })
       .addCase(deleteMaid.fulfilled, (state, action) => {
+        console.log("deleteMaid fulfilled action:", action);
         state.loading = false;
         state.maidDeleted = true;
-        state.maids = state.maids.filter(
-          (maid) => maid.id !== action.payload.id
+        state.maids.maids = state.maids.maids.filter(
+          (maid) => maid._id !== action.payload.id
         );
       })
       .addCase(deleteMaid.rejected, (state, action) => {

@@ -46,9 +46,14 @@ export const getMaidsByArea = async ({ area, page, limit }, token) => {
   }
 };
 
-export const deleteMaid = async (maidId) => {
+export const deleteMaid = async (data,token) => {
   try {
-    const response = await API.post("/maid/delete", { id: maidId });
+    console.log("deleteMaid maidId   data:", data);
+    const response = await API.post("/maid/delete", data,{
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     return response.data;
   } catch (error) {
     console.error("Error deleting maid:", error);

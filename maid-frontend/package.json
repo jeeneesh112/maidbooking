@@ -18,6 +18,8 @@
     "axios": "^1.8.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-dropzone": "^14.3.8",
+    "react-hook-form": "^7.56.1",
     "react-redux": "^9.2.0",
     "react-router-dom": "^6.30.0",
     "redux-persist": "^6.0.0"
