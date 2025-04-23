@@ -10,9 +10,12 @@ import PrivateRoute from "./utils/PrivateRoute";
 import EditMaid from "./pages/EditMaid";
 import Sidebar from "./pages/Sidebar";
 import Profile from "./pages/Profile";
+import TokenExpiryWatcher from "./utils/TokenExpiryWatcher";
 
 const App = () => {
   return (
+    <>
+    <TokenExpiryWatcher/>
     <Routes>
       <Route path="/auth/signup" element={<Signup />} />
       <Route path="/auth/login" element={<Login />} />
@@ -64,6 +67,7 @@ const App = () => {
 
       </Route>
     </Routes>
+    </>
   );
 };
 

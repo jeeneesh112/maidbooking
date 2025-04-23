@@ -20,6 +20,8 @@ const Profile = () => {
 
   const { userData, loading, error } = useSelector((state) => state.profile);
 
+  console.log("error:", error);
+
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
   if (!userData) return <div>No user data found</div>;
