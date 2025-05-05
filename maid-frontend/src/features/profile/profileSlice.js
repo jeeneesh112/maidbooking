@@ -50,7 +50,6 @@ const profileSlice = createSlice({
       })
       .addCase(fetchProfile.fulfilled, (state, action) => {
         state.loading = false;
-        
         if (!action.payload) {
           state.error = "Received empty profile data";
           return;

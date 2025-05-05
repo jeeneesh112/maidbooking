@@ -25,8 +25,8 @@ export const addMaid = async (req, res) => {
     };
 
     try {
-        await Maid.create(maidBody);
-        res.status(201).json({ message: "Maid added successfully" });
+        const data = await Maid.create(maidBody);
+        res.status(201).json({ message: "Maid added successfully", data });
     } catch (error) {
         res.status(500).json({ message: "Internal server error" });
     }
@@ -78,7 +78,7 @@ export const deleteMaid = async (req, res) => {
             return res.status(404).json({ message: "Maid not found" });
         }
         await Maid.deleteOne({ _id: id });
-        res.status(200).json({ message: "Maid deleted successfully" });
+        res.status(200).json({ message: "Maid deleted successfully" , maid });
     } catch (error) {
         res.status(500).json({ message: "Internal server error" });
     }

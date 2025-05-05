@@ -9,7 +9,7 @@ import profileReducer from '../features/profile/profileSlice';
 const persistConfig = {
     key: 'root',
     storage,
-    whitelist: ['auth', 'profile'], // specify which reducers you want to persist
+    whitelist: ['auth', 'profile','maid'], // specify which reducers you want to persist
   };
 
   const rootReducer = {

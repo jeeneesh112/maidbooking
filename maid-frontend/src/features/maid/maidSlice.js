@@ -114,8 +114,9 @@ const maidSlice = createSlice({
         state.loading = true;
       })
       .addCase(fetchMaid.fulfilled, (state, action) => {
+        console.log("fetchMaid fulfilled action.payload:", action.payload);
         state.loading = false;
-        state.maids = action.payload;
+        state.maids = action.payload.maids;
       })
       .addCase(fetchMaid.rejected, (state, action) => {
         state.loading = false;
@@ -138,10 +139,9 @@ const maidSlice = createSlice({
       .addCase(createMaid.fulfilled, (state, action) => {
         state.loading = false;
         state.maidCreated = true;
-        state.maids.maids.push(action.payload);
+        state.maids.push(action.payload.data);
       })
       .addCase(createMaid.rejected, (state, action) => {
-        console.error("Error in createMaid...action:", action);
         state.loading = false;
         state.error = action.payload || action.error.message;
       })
@@ -165,17 +165,16 @@ const maidSlice = createSlice({
       .addCase(deleteMaid.pending, (state) => {
         state.loading = true;
       })
-      .addCase(deleteMaid.fulfilled, (state, action) => {
-        console.log("deleteMaid fulfilled action:", action);
+      .addCase(deleteMaid.fulfilled, (state,action) => {
         state.loading = false;
         state.maidDeleted = true;
-        state.maids.maids = state.maids.maids.filter(
-          (maid) => maid._id !== action.payload.id
+        state.maids = state.maids.filter(
+          (maid) => maid._id !== action.payload.maid._id
         );
       })
       .addCase(deleteMaid.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message;
+        state.error = action.payload || action.error.message;
       });
   },
 });

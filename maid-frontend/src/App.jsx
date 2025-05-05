@@ -11,7 +11,8 @@ import EditMaid from "./pages/EditMaid";
 import Sidebar from "./pages/Sidebar";
 import Profile from "./pages/Profile";
 import TokenExpiryWatcher from "./utils/TokenExpiryWatcher";
-import Unauthorized from "./pages/Unauthorized";        
+import Unauthorized from "./pages/Unauthorized"; 
+import BookMaid from "./pages/BookMaid";       
 
 const App = () => {
   return (
@@ -72,6 +73,11 @@ const App = () => {
           <Route element={<PrivateRoute allowedRoles={["manage_maids"]} />}>
             <Route path="/admin/maids/edit/:maidId" element={<EditMaid />} />
           </Route>
+
+            <Route element={<PrivateRoute allowedRoles={["book_maid"]} />}>
+            <Route path="/book-maid" element={<BookMaid />} />
+            </Route>
+
         </Route>
       </Routes>
     </>
