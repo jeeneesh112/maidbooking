@@ -82,13 +82,13 @@ const AddMaid = () => {
 
   const handleCheckboxChange = (e) => {
     const { name, value, checked } = e.target;
-    setMaidData(prev => {
+    setMaidData((prev) => {
       const currentServices = prev.services || [];
       return {
         ...prev,
         [name]: checked
           ? [...currentServices, value]
-          : currentServices.filter(service => service !== value)
+          : currentServices.filter((service) => service !== value),
       };
     });
   };
@@ -281,9 +281,30 @@ const AddMaid = () => {
                       <TableCell>{maid?.mobile}</TableCell>
                       <TableCell>{maid?.availability}</TableCell>
                       <TableCell>
-                        {maid?.services?.length > 0
-                          ? maid?.services.join(", ")
-                          : "No services offered"}
+                        {maid?.services?.length > 0 ? (
+                          <div
+                            style={{
+                              display: "flex",
+                              flexDirection: "column",
+                              gap: 4,
+                            }}
+                          >
+                            {maid.services.map((service, index) => (
+                              <div
+                                key={index}
+                                style={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                }}
+                              >
+                                <span style={{ marginRight: 8 }}>•</span>
+                                {service}
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          "No services offered"
+                        )}
                       </TableCell>
                       <TableCell>{maid?.area}</TableCell>
                       <TableCell>{maid?.city}</TableCell>
