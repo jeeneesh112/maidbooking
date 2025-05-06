@@ -23,11 +23,27 @@ const bookingSchema = new mongoose.Schema({
         type: Date,
         required: true,
     },
-    // status : {
-    //     type: String,
-    //     enum: ['pending', 'confirmed', 'completed', 'cancelled'],
-    //     default: 'pending',
-    // },
+    bookingType: {
+        type: String,
+        required: true,
+        enum: ['morning', 'night', 'full-day'],
+    },
+    services : {
+        type: [String],
+        required: true,
+        enum: [
+            'clothes cleaning',
+            'floor cleaning',
+            'utensils cleaning',
+            'cooking',
+            'baby care',
+        ],
+    },
+    status : {
+        type: String,
+        enum: ['pending', 'confirmed', 'completed', 'cancelled'],
+        default: 'pending',
+    },
     totalAmount : {
         type: Number,
         required: true,
