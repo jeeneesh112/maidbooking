@@ -1,7 +1,7 @@
 import Maid from "../models/Maid.mjs";
 
 export const addMaid = async (req, res) => {
-    const { name, mobile, pic, state, city, area, pincode, salary } = req.body; 
+    const { name, mobile, pic, state, city, area, pincode, salary,availability,services } = req.body; 
 
     console.log("Maid Data:", req.body);
 
@@ -21,7 +21,9 @@ export const addMaid = async (req, res) => {
         city,
         area,
         pincode,
-        salaryPerMonth : salary
+        salaryPerMonth : salary,
+        availability,
+        services,
     };
 
     try {

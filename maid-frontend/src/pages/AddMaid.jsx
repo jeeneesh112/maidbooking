@@ -17,6 +17,13 @@ import {
   Dialog,
   DialogContent,
   Divider,
+  FormControl,
+  FormLabel,
+  RadioGroup,
+  FormControlLabel,
+  Radio,
+  FormGroup,
+  Checkbox,
 } from "@mui/material";
 import { Edit, Delete } from "@mui/icons-material";
 import { useDispatch, useSelector } from "react-redux";
@@ -33,6 +40,8 @@ const initialMaidData = {
   area: "",
   pincode: "",
   salary: "",
+  availability: "",
+  services: [],
 };
 
 const AddMaid = () => {
@@ -69,6 +78,19 @@ const AddMaid = () => {
     const { name, value } = e.target;
     setMaidData((prev) => ({ ...prev, [name]: value }));
     setErrors((prev) => ({ ...prev, [name]: "" }));
+  };
+
+  const handleCheckboxChange = (e) => {
+    const { name, value, checked } = e.target;
+    setMaidData(prev => {
+      const currentServices = prev.services || [];
+      return {
+        ...prev,
+        [name]: checked
+          ? [...currentServices, value]
+          : currentServices.filter(service => service !== value)
+      };
+    });
   };
 
   const validateFields = useCallback((data) => {
@@ -188,6 +210,12 @@ const AddMaid = () => {
                     <strong>Mobile</strong>
                   </TableCell>
                   <TableCell>
+                    <strong>Availability</strong>
+                  </TableCell>
+                  <TableCell>
+                    <strong>Services</strong>
+                  </TableCell>
+                  <TableCell>
                     <strong>Area</strong>
                   </TableCell>
                   <TableCell>
@@ -251,6 +279,12 @@ const AddMaid = () => {
                       </TableCell>
                       <TableCell>{maid?.name}</TableCell>
                       <TableCell>{maid?.mobile}</TableCell>
+                      <TableCell>{maid?.availability}</TableCell>
+                      <TableCell>
+                        {maid?.services?.length > 0
+                          ? maid?.services.join(", ")
+                          : "No services offered"}
+                      </TableCell>
                       <TableCell>{maid?.area}</TableCell>
                       <TableCell>{maid?.city}</TableCell>
                       <TableCell>{maid?.state}</TableCell>
@@ -371,6 +405,28 @@ const AddMaid = () => {
                   type: "text",
                 },
                 {
+                  name: "availability",
+                  label: "Availability",
+                  required: true,
+                  type: "radio",
+                  options: [
+                    { value: "morning", label: "Morning" },
+                    { value: "night", label: "Night" },
+                    { value: "full-day", label: "Full Day" },
+                  ],
+                },
+                {
+                  name: "services",
+                  label: "Services Offered",
+                  required: true,
+                  type: "checkbox",
+                  options: [
+                    { value: "clothes cleaning", label: "Clothes Cleaning" },
+                    { value: "floor cleaning", label: "Floor Cleaning" },
+                    { value: "utensils cleaning", label: "Utensils Cleaning" },
+                  ],
+                },
+                {
                   name: "salary",
                   label: "Expected Salary (₹) ",
                   required: true,
@@ -378,23 +434,82 @@ const AddMaid = () => {
                 },
               ].map((field) => (
                 <Grid item xs={12} sm={6} key={field.name}>
-                  <TextField
-                    label={field.label}
-                    name={field.name}
-                    fullWidth
-                    value={maidData[field.name]}
-                    onChange={handleChange}
-                    size="medium"
-                    type={field.type}
-                    required={field.required}
-                    error={!!errors[field.name]}
-                    helperText={errors[field.name]}
-                    variant="outlined"
-                    sx={{
-                      borderRadius: 2,
-                      backgroundColor: field.required ? "#fff8f0" : "#f8fafc",
-                    }}
-                  />
+                  {field.type === "radio" ? (
+                    <FormControl component="fieldset" fullWidth>
+                      <FormLabel component="legend" required={field.required}>
+                        {field.label}
+                      </FormLabel>
+                      <RadioGroup
+                        row
+                        name={field.name}
+                        value={maidData[field.name] || ""}
+                        onChange={handleChange}
+                      >
+                        {field.options.map((option) => (
+                          <FormControlLabel
+                            key={option.value}
+                            value={option.value}
+                            control={<Radio />}
+                            label={option.label}
+                          />
+                        ))}
+                      </RadioGroup>
+                      {errors[field.name] && (
+                        <FormHelperText error>
+                          {errors[field.name]}
+                        </FormHelperText>
+                      )}
+                    </FormControl>
+                  ) : field.type === "checkbox" ? (
+                    <FormControl component="fieldset" fullWidth>
+                      <FormLabel component="legend" required={field.required}>
+                        {field.label}
+                      </FormLabel>
+                      <FormGroup row>
+                        {field.options.map((option) => (
+                          <FormControlLabel
+                            key={option.value}
+                            control={
+                              <Checkbox
+                                checked={
+                                  maidData[field.name]?.includes(
+                                    option.value
+                                  ) || false
+                                }
+                                onChange={handleCheckboxChange}
+                                name={field.name}
+                                value={option.value}
+                              />
+                            }
+                            label={option.label}
+                          />
+                        ))}
+                      </FormGroup>
+                      {errors[field.name] && (
+                        <FormHelperText error>
+                          {errors[field.name]}
+                        </FormHelperText>
+                      )}
+                    </FormControl>
+                  ) : (
+                    <TextField
+                      label={field.label}
+                      name={field.name}
+                      fullWidth
+                      value={maidData[field.name]}
+                      onChange={handleChange}
+                      size="medium"
+                      type={field.type}
+                      required={field.required}
+                      error={!!errors[field.name]}
+                      helperText={errors[field.name]}
+                      variant="outlined"
+                      sx={{
+                        borderRadius: 2,
+                        backgroundColor: field.required ? "#fff8f0" : "#f8fafc",
+                      }}
+                    />
+                  )}
                 </Grid>
               ))}
             </Grid>
