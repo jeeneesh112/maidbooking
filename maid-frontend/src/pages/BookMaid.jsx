@@ -18,6 +18,13 @@ import {
   Dialog,
   DialogContent,
   Divider,
+  FormControl,
+  FormLabel,
+  RadioGroup,
+  Radio,
+  FormControlLabel,
+  FormGroup,
+  Checkbox,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { useSelector } from "react-redux";
@@ -35,6 +42,8 @@ const BookMaid = () => {
     maidId: "",
     durationMonths: "",
     startDate: "",
+    services: [],
+    availability: "",
   });
 
   const [modalOpen, setModalOpen] = useState(false);
@@ -45,9 +54,19 @@ const BookMaid = () => {
     setFormData({ ...formData, [name]: value });
   };
 
+  const handleServiceChange = (e) => {
+    const { name, checked } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      services: checked
+        ? [...prev.services, name]
+        : prev.services.filter((service) => service !== name),
+    }));
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    const { maidId, durationMonths, startDate } = formData;
+    const { maidId, durationMonths, startDate  , services, availability} = formData;
 
     const start = dayjs(startDate);
     const end = start.add(Number(durationMonths), "month");
@@ -65,11 +84,19 @@ const BookMaid = () => {
       startDate: start.format("YYYY-MM-DD"),
       endDate: end.format("YYYY-MM-DD"),
       totalAmount,
+      services,
+      availability,
     };
 
     setBookings([...bookings, newBooking]);
     setModalOpen(false);
-    setFormData({ maidId: "", durationMonths: "", startDate: "" });
+    setFormData({
+      maidId: "",
+      durationMonths: "",
+      startDate: "",
+      services: [],
+      availability: "",
+    });
     setSnackbar({ open: true, message: "Booking submitted successfully!" });
 
     // Call your API to persist booking here
@@ -118,6 +145,8 @@ const BookMaid = () => {
             <TableHead sx={{ backgroundColor: "#fff3e0" }}>
               <TableRow>
                 <TableCell>Maid</TableCell>
+                <TableCell>Availability</TableCell>
+                <TableCell>Services</TableCell>
                 <TableCell>Duration (Months)</TableCell>
                 <TableCell>Start Date</TableCell>
                 <TableCell>End Date</TableCell>
@@ -137,6 +166,10 @@ const BookMaid = () => {
                 bookings.map((booking, idx) => (
                   <TableRow key={idx}>
                     <TableCell>{booking.maidName}</TableCell>
+                    <TableCell>{booking.availability}</TableCell>
+                    <TableCell>
+                      {booking.services.join(", ")}
+                    </TableCell>
                     <TableCell>{booking.durationMonths}</TableCell>
                     <TableCell>{booking.startDate}</TableCell>
                     <TableCell>{booking.endDate}</TableCell>
@@ -178,7 +211,112 @@ const BookMaid = () => {
 
           <form onSubmit={handleSubmit}>
             <Grid container spacing={3}>
+              {" "}
               <Grid item xs={12}>
+                <FormControl component="fieldset" fullWidth>
+                  <FormLabel component="legend" required>
+                    Select Availability
+                  </FormLabel>
+                  <RadioGroup
+                    row
+                    name="availability"
+                    value={formData.availability}
+                    onChange={handleChange}
+                  >
+                    <FormControlLabel
+                      value="morning"
+                      control={<Radio />}
+                      label="Morning"
+                    />
+                    <FormControlLabel
+                      value="night"
+                      control={<Radio />}
+                      label="Night"
+                    />
+                    <FormControlLabel
+                      value="full-day"
+                      control={<Radio />}
+                      label="Full Day"
+                    />
+                  </RadioGroup>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12}>
+                <FormControl component="fieldset" fullWidth>
+                  <FormLabel component="legend" required>
+                    Select Required Services
+                  </FormLabel>
+                  <FormGroup row>
+                    {[
+                      "clothes cleaning",
+                      "floor cleaning",
+                      "utensils cleaning",
+                    ].map((service) => (
+                      <FormControlLabel
+                        key={service}
+                        control={
+                          <Checkbox
+                            checked={formData.services.includes(service)}
+                            onChange={handleServiceChange}
+                            name={service}
+                          />
+                        }
+                        label={service}
+                      />
+                    ))}
+                  </FormGroup>
+                </FormControl>
+              </Grid>
+              {formData.availability && (
+                <Grid item xs={12}>
+                  <TextField
+                    select
+                    fullWidth
+                    label="Select Maid"
+                    name="maidId"
+                    value={formData.maidId}
+                    onChange={handleChange}
+                    required
+                    variant="outlined"
+                    size="medium"
+                    sx={{
+                      borderRadius: 2,
+                      backgroundColor: "#f8fafc",
+                      height: "56px",
+                    }}
+                  >
+                    {maids
+                      ?.filter((maid) => {
+                        // Filter maids based on availability
+                        if (maid.availability === "full-day") {
+                          return (
+                            formData.availability === "full-day" &&
+                            (formData.services.length === 0 ||
+                              formData.services.every((service) =>
+                                maid.services.includes(service)
+                              ))
+                          );
+                        }
+                        return maid.availability === formData.availability;
+                      })
+                      .map((maid) => (
+                        <MenuItem key={maid._id} value={maid._id}>
+                          <Box
+                            display="flex"
+                            justifyContent="space-between"
+                            width="100%"
+                          >
+                            <span style={{ fontWeight: 500 }}>{maid.name}</span>
+                            <span style={{ color: "#4a5568" }}>
+                              ₹{maid.salaryPerMonth.toLocaleString()}/month
+                            </span>
+                          </Box>
+                        </MenuItem>
+                      ))}
+                  </TextField>
+                </Grid>
+              )}
+              {/* <Grid item xs={12}>
                 <TextField
                   select
                   fullWidth
@@ -213,7 +351,7 @@ const BookMaid = () => {
                     </MenuItem>
                   ))}
                 </TextField>
-              </Grid>
+              </Grid> */}
               <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
@@ -227,15 +365,15 @@ const BookMaid = () => {
                   size="medium"
                   sx={{
                     borderRadius: 2,
-                      backgroundColor: "#f8fafc",
-                      height: "56px",
+                    backgroundColor: "#f8fafc",
+                    height: "56px",
                   }}
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
-                //   label="Start Date"
+                  //   label="Start Date"
                   name="startDate"
                   type="date"
                   value={formData.startDate}
@@ -347,7 +485,6 @@ const BookMaid = () => {
                     </Grid>
                   );
                 })()}
-
               <Grid item xs={12} mt={10}>
                 <Box display="flex" justifyContent="flex-end" gap={2}>
                   <Button

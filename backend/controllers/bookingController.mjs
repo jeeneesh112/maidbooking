@@ -2,7 +2,7 @@ import Booking from "../models/Booking.mjs";
 import Maid from "../models/Maid.mjs";
 
 export const bookMaid = async (req, res) => {
-    const { maidId, bookingDate } = req.body;
+    const { maidId, bookingDate,availability, services } = req.body;
     const userId = req.user.id;
 
     const maid = await Maid.findById(maidId);
@@ -23,6 +23,8 @@ export const bookMaid = async (req, res) => {
         startDate,
         endDate,
         totalAmount,
+        availability,
+        services
     };
 
     try {
