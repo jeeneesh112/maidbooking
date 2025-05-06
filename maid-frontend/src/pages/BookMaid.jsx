@@ -25,6 +25,7 @@ import {
   FormControlLabel,
   FormGroup,
   Checkbox,
+  Chip,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { useSelector } from "react-redux";
@@ -86,6 +87,7 @@ const BookMaid = () => {
       totalAmount,
       services,
       availability,
+      status: "pending",
     };
 
     setBookings([...bookings, newBooking]);
@@ -151,6 +153,7 @@ const BookMaid = () => {
                 <TableCell>Start Date</TableCell>
                 <TableCell>End Date</TableCell>
                 <TableCell>Total Amount (₹)</TableCell>
+                <TableCell>Status</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -174,6 +177,34 @@ const BookMaid = () => {
                     <TableCell>{booking.startDate}</TableCell>
                     <TableCell>{booking.endDate}</TableCell>
                     <TableCell>₹{booking.totalAmount}</TableCell>
+                    <TableCell>
+                      <Chip
+                        label={booking.status}
+                        color={
+                          booking.status === "confirmed"
+                            ? "success"
+                            : booking.status === "pending"
+                            ? "warning"
+                            : "error"
+                        }
+                        variant="outlined"
+                        size="small"
+                        sx={{
+                          backgroundColor:
+                            booking.status === "confirmed"
+                              ? "#f0fff4"
+                              : booking.status === "pending"
+                              ? "#fff3cd"
+                              : "#fff5f5",
+                          color:
+                            booking.status === "confirmed"
+                              ? "#2f855a"
+                              : booking.status === "pending"
+                              ? "#856404"
+                              : "#721c24",
+                        }}
+                      />
+                    </TableCell>
                   </TableRow>
                 ))
               )}
