@@ -46,7 +46,7 @@ const Signup = () => {
     e.preventDefault();
     try {
       await dispatch(signup(formData));
-      navigate("/auth/otp");
+      navigate("/auth/login");
     } catch (err) {
       console.error(err.message);
     }
