@@ -4,6 +4,7 @@ import storage from 'redux-persist/lib/storage';
 import authReducer from '../features/auth/authSlice';
 import maidReducer from '../features/maid/maidSlice';
 import profileReducer from '../features/profile/profileSlice';
+import bookingReducer from '../features/booking/bookingSlice';
 // import bookingReducer from '../features/booking/bookingSlice';
 
 const persistConfig = {
@@ -16,6 +17,7 @@ const persistConfig = {
     auth: authReducer,
     profile: profileReducer,
     maid : maidReducer,
+    booking: bookingReducer,
     // add other reducers here
   };
 

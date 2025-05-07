@@ -24,6 +24,7 @@ import {
   Radio,
   FormGroup,
   Checkbox,
+  InputAdornment,
 } from "@mui/material";
 import { Edit, Delete } from "@mui/icons-material";
 import { useDispatch, useSelector } from "react-redux";
@@ -51,12 +52,14 @@ const AddMaid = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [errors, setErrors] = useState({});
   const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(10);
+  const [limit, setLimit] = useState(2);
 
   const dispatch = useDispatch();
   const { maids, loading, error } = useSelector((state) => state.maid);
   const { userData } = useSelector((state) => state.profile);
   const { token, user } = useSelector((state) => state.auth);
+
+  const paginatedMaids = maids?.slice((page - 1) * limit, page * limit) || [];
 
   const fetchMaids = useCallback(() => {
     dispatch(
@@ -80,15 +83,39 @@ const AddMaid = () => {
     setErrors((prev) => ({ ...prev, [name]: "" }));
   };
 
-  const handleCheckboxChange = (e) => {
-    const { name, value, checked } = e.target;
+  const handleServiceToggle = (e, serviceName) => {
+    const isChecked = e.target.checked;
+
     setMaidData((prev) => {
       const currentServices = prev.services || [];
+
+      if (isChecked) {
+        // Add new service with empty salary (user will fill it)
+        return {
+          ...prev,
+          services: [...currentServices, { name: serviceName, salary: 0 }],
+        };
+      } else {
+        // Remove service
+        return {
+          ...prev,
+          services: currentServices.filter((s) => s.name !== serviceName),
+        };
+      }
+    });
+  };
+
+  const handleSalaryChange = (serviceName, newSalary) => {
+    setMaidData((prev) => {
+      const currentServices = prev.services || [];
+
       return {
         ...prev,
-        [name]: checked
-          ? [...currentServices, value]
-          : currentServices.filter((service) => service !== value),
+        services: currentServices.map((service) =>
+          service.name === serviceName
+            ? { ...service, salary: Number(newSalary) }
+            : service
+        ),
       };
     });
   };
@@ -115,6 +142,7 @@ const AddMaid = () => {
     }
 
     try {
+      console.log("Maid Data:", maidData);
       await dispatch(createMaid({ ...maidData, id: Date.now() })).unwrap();
       setMaidData(initialMaidData);
       setErrors({});
@@ -140,6 +168,7 @@ const AddMaid = () => {
     setMaidData(initialMaidData);
     setErrors({});
   };
+  
 
   return (
     <Box
@@ -233,7 +262,7 @@ const AddMaid = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {maids?.length === 0 ? (
+                {paginatedMaids?.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={8} align="center">
                       <Typography variant="h6" color="text.secondary">
@@ -242,7 +271,7 @@ const AddMaid = () => {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  maids?.map((maid) => (
+                  paginatedMaids?.map((maid) => (
                     <TableRow key={maid?._id} hover>
                       <TableCell>
                         {maid?.picture ? (
@@ -282,25 +311,41 @@ const AddMaid = () => {
                       <TableCell>{maid?.availability}</TableCell>
                       <TableCell>
                         {maid?.services?.length > 0 ? (
-                          <div
-                            style={{
-                              display: "flex",
-                              flexDirection: "column",
-                              gap: 4,
-                            }}
-                          >
-                            {maid.services.map((service, index) => (
-                              <div
-                                key={index}
-                                style={{
-                                  display: "flex",
-                                  alignItems: "center",
-                                }}
-                              >
-                                <span style={{ marginRight: 8 }}>•</span>
-                                {service}
-                              </div>
-                            ))}
+                          <div>
+                            <div
+                              style={{
+                                display: "flex",
+                                flexDirection: "column",
+                                gap: 4,
+                                marginBottom: 8,
+                              }}
+                            >
+                              {maid.services.map((service, index) => (
+                                <div
+                                  key={index}
+                                  style={{
+                                    display: "flex",
+                                    alignItems: "baseline",
+                                  }}
+                                >
+                                  <span style={{ marginRight: 8 }}>•</span>
+                                  <span>
+                                    {service.name} (₹
+                                    {service.salary.toLocaleString()})
+                                  </span>
+                                </div>
+                              ))}
+                            </div>
+                            <div style={{ fontWeight: "bold" }}>
+                              Total: ₹
+                              {maid.services
+                                .reduce(
+                                  (sum, service) => sum + service.salary,
+                                  0
+                                )
+                                .toLocaleString()}
+                              /month
+                            </div>
                           </div>
                         ) : (
                           "No services offered"
@@ -340,7 +385,7 @@ const AddMaid = () => {
                 setLimit(parseInt(event.target.value, 10));
                 setPage(1);
               }}
-              rowsPerPageOptions={[5, 10, 25, 50]}
+              rowsPerPageOptions={[2, 5, 10, 25]}
               sx={{ px: 2, py: 1 }}
             />
           </>
@@ -436,11 +481,22 @@ const AddMaid = () => {
                     { value: "full-day", label: "Full Day" },
                   ],
                 },
+                // {
+                //   name: "services",
+                //   label: "Services Offered",
+                //   required: true,
+                //   type: "checkbox",
+                //   options: [
+                //     { value: "clothes cleaning", label: "Clothes Cleaning" },
+                //     { value: "floor cleaning", label: "Floor Cleaning" },
+                //     { value: "utensils cleaning", label: "Utensils Cleaning" },
+                //   ],
+                // },
                 {
                   name: "services",
                   label: "Services Offered",
                   required: true,
-                  type: "checkbox",
+                  type: "service-selector", // Custom type we'll handle
                   options: [
                     { value: "clothes cleaning", label: "Clothes Cleaning" },
                     { value: "floor cleaning", label: "Floor Cleaning" },
@@ -481,37 +537,57 @@ const AddMaid = () => {
                         </FormHelperText>
                       )}
                     </FormControl>
-                  ) : field.type === "checkbox" ? (
-                    <FormControl component="fieldset" fullWidth>
+                  ) : field.type === "service-selector" ? (
+                    <div>
                       <FormLabel component="legend" required={field.required}>
                         {field.label}
                       </FormLabel>
-                      <FormGroup row>
-                        {field.options.map((option) => (
-                          <FormControlLabel
-                            key={option.value}
-                            control={
-                              <Checkbox
-                                checked={
-                                  maidData[field.name]?.includes(
-                                    option.value
-                                  ) || false
+
+                      {field.options.map((option) => {
+                        const service = maidData.services?.find(
+                          (s) => s.name === option.value
+                        );
+                        const isSelected = !!service;
+
+                        return (
+                          <div key={option.value} style={{ marginBottom: 16 }}>
+                            <FormControlLabel
+                              control={
+                                <Checkbox
+                                  checked={isSelected}
+                                  onChange={(e) =>
+                                    handleServiceToggle(e, option.value)
+                                  }
+                                />
+                              }
+                              label={option.label}
+                            />
+
+                            {isSelected && (
+                              <TextField
+                                type="number"
+                                label="Monthly Salary"
+                                value={service.salary || ""}
+                                onChange={(e) =>
+                                  handleSalaryChange(
+                                    option.value,
+                                    e.target.value
+                                  )
                                 }
-                                onChange={handleCheckboxChange}
-                                name={field.name}
-                                value={option.value}
+                                style={{ marginLeft: 24, width: 200 }}
+                                InputProps={{
+                                  startAdornment: (
+                                    <InputAdornment position="start">
+                                      ₹
+                                    </InputAdornment>
+                                  ),
+                                }}
                               />
-                            }
-                            label={option.label}
-                          />
-                        ))}
-                      </FormGroup>
-                      {errors[field.name] && (
-                        <FormHelperText error>
-                          {errors[field.name]}
-                        </FormHelperText>
-                      )}
-                    </FormControl>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
                   ) : (
                     <TextField
                       label={field.label}

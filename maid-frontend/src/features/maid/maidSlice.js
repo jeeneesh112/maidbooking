@@ -114,7 +114,6 @@ const maidSlice = createSlice({
         state.loading = true;
       })
       .addCase(fetchMaid.fulfilled, (state, action) => {
-        console.log("fetchMaid fulfilled action.payload:", action.payload);
         state.loading = false;
         state.maids = action.payload.maids;
       })

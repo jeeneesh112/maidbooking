@@ -46,15 +46,26 @@ const maidSchema = new mongoose.Schema(
       enum: ["morning", "night", "full-day"],
     },
     services: {
-      type: [String],
-      required: true,
-      enum: [
-        "clothes cleaning",
-        "floor cleaning",
-        "utensils cleaning",
-        "cooking",
-        "baby care",
+      type: [
+        {
+          name: {
+            type: String,
+            required: true,
+            enum: [
+              "clothes cleaning",
+              "floor cleaning",
+              "utensils cleaning",
+              "cooking",
+              "baby care",
+            ],
+          },
+          salary: {
+            type: Number,
+            required: true,
+          },
+        },
       ],
+      required: true,
     },
   },
   {

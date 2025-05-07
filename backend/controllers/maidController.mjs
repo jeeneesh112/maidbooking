@@ -3,11 +3,7 @@ import Maid from "../models/Maid.mjs";
 export const addMaid = async (req, res) => {
     const { name, mobile, pic, state, city, area, pincode, salary,availability,services } = req.body; 
 
-    console.log("Maid Data:", req.body);
-
     const existData = await Maid.findOne({ mobile });
-
-    console.log("Exist Data:", existData);
 
     if (existData) {
         return res.status(400).json({ message: "Maid already exists" });

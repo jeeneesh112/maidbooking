@@ -1,4 +1,3 @@
-// src/layouts/MainLayout.jsx
 import React, { useState } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import {
@@ -23,8 +22,8 @@ import { useSelector } from "react-redux";
 
 const menuItems = [
   { text: "Dashboard", icon: <DashboardIcon />, path: "/dashboard" , roles: ["view_dashboard"]},
-  { text: "Book a Maid", icon: <CleaningIcon />, path: "/book-maid", roles: ["book_maid"]},
-  { text: "My Bookings", icon: <BookingsIcon />, path: "/my-bookings", roles: ["view_bookings"]},
+  { text: "Book a Maid", icon: <CleaningIcon />, path: "/book-maid", roles: ["manage_bookings"]},
+  // { text: "My Bookings", icon: <BookingsIcon />, path: "/my-bookings", roles: ["view_bookings"]},
   { text: "Manage Bookings", icon: <BookingsIcon />, path: "/admin/bookings" , roles: ["manage_bookings"]},
   { text: "Manage Maids", icon: <CleaningIcon />, path: "/admin/maids" , roles: ["manage_maids"]},
   {text : "Profile", icon: <PersonOutline />, path: "/profile",roles: ["view_profile"],},
