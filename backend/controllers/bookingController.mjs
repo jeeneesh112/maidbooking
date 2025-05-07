@@ -1,5 +1,6 @@
 import Booking from "../models/Booking.mjs";
 import Maid from "../models/Maid.mjs";
+import mongoose from "mongoose";
 
 export const bookMaid = async (req, res) => {
   const { maidId, startDate, availability, services, durationMonths } =
@@ -52,10 +53,57 @@ export const getmaidbyUser = async (req, res) => {
 
   const total = await Booking.countDocuments({ userId });
 
-  const bookings = await Booking.find({ userId })
-    .skip(skip)
-    .limit(Number(limit))
-    .sort({ startDate: 1 });
+  // const bookings = await Booking.find({ userId })
+  //   .skip(skip)
+  //   .limit(Number(limit))
+  //   .sort({ startDate: 1 });
+
+  const aggregate = [
+    {
+      $match: { 
+        userId: mongoose.Types.ObjectId(userId),
+       },
+    },
+    {
+      $lookup: {
+        from: "maids",
+        localField: "maidId",
+        foreignField: "_id",
+        as: "maidDetails",
+      },
+    },
+    {
+      $unwind: "$maidDetails",
+    },
+    {
+      $project: {
+        _id: 1,
+        userId: 1,
+        maidId: 1,
+        startDate: 1,
+        endDate: 1,
+        availability: 1,
+        services: 1,
+        status: 1,
+        totalAmount: 1,
+        durationMonths: 1,
+        maidDetails: {
+          name: "$maidDetails.name",
+          area: "$maidDetails.area",
+          city: "$maidDetails.city",
+          phoneNumber: "$maidDetails.phoneNumber",
+          imageUrl: "$maidDetails.imageUrl",
+          salaryPerMonth: "$maidDetails.salaryPerMonth",
+          services: "$maidDetails.services",
+        },
+      },
+    },
+    { $sort: { startDate: -1 } },
+    { $skip: skip },
+    { $limit: Number(limit) },
+  ];
+
+  const bookings = await Booking.aggregate(aggregate);
 
   res.json({
     total,
@@ -65,22 +113,114 @@ export const getmaidbyUser = async (req, res) => {
   });
 };
 
-export const getAllBookings = async (req, res) => {
-  const { page = 1, limit = 10, area, city } = req.query;
+export const allmaidBookings = async (req, res) => {
+  const { page = 1, limit = 10 } = req.body;
   const skip = (page - 1) * limit;
-
-  const filter = {};
-  if (area) filter["maidId.area"] = area;
-  if (city) filter["maidId.city"] = city;
-
-  const bookings = await Booking.find()
-    .populate("maidId")
-    .populate("userId")
-    .sort({ startDate: -1 })
-    .skip(skip)
-    .limit(Number(limit));
 
   const total = await Booking.countDocuments();
 
-  res.json({ total, page: Number(page), limit: Number(limit), bookings });
-};
+  const aggregate = [
+    {
+      $lookup: {
+        from: "users",
+        localField: "userId",
+        foreignField: "_id",
+        as: "userDetails",
+      },
+    },
+    {
+      $unwind: "$userDetails",
+    },
+    {
+      $project: {
+        _id: 1,
+        userId: 1,
+        maidId: 1,
+        startDate: 1,
+        endDate: 1,
+        availability: 1,
+        services: 1,
+        status: 1,
+        totalAmount: 1,
+        durationMonths: 1,
+        userDetails: {
+          name: "$userDetails.name",
+          mobile: "$userDetails.mobile",
+        },
+      },
+    },
+    { $sort: { startDate: -1 } },
+    { $skip: skip },
+    { $limit: Number(limit) },
+  ];
+
+  const bookings = await Booking.aggregate(aggregate);
+
+  res.json({
+    total,
+    page: Number(page),
+    limit: Number(limit),
+    bookings,
+  });
+}
+
+export const getmaidviseBookings = async (req, res) => {
+  const {maidId } = req.body;
+
+  const total = await Booking.countDocuments();
+
+  const aggregate = [
+    {
+      $match: { 
+        maidId: mongoose.Types.ObjectId(maidId),
+       },
+    },
+    {
+      $lookup: {
+        from: "maids",
+        localField: "maidId",
+        foreignField: "_id",
+        as: "maidDetails",
+      },
+    },
+    {
+      $unwind: "$maidDetails",
+    },
+    {
+      $project: {
+        _id: 1,
+        userId: 1,
+        maidId: 1,
+        startDate: 1,
+        endDate: 1,
+        availability: 1,
+        services: 1,
+        status: 1,
+        totalAmount: 1,
+        durationMonths: 1,
+        maidDetails: {
+          name: "$maidDetails.name",
+          area: "$maidDetails.area",
+          city: "$maidDetails.city",
+          mobile: "$maidDetails.mobile",
+          picture: "$maidDetails.picture",
+          salaryPerMonth: "$maidDetails.salaryPerMonth",
+          services: "$maidDetails.services",
+          status : "$maidDetails.status",
+          availability: "$maidDetails.availability",
+        },
+      },
+    },
+    { $sort: { startDate: -1 } },
+  ];
+
+  const bookings = await Booking.aggregate(aggregate);
+
+  res.json({
+    total,
+    bookings,
+  });
+}
+
+
+

@@ -20,8 +20,6 @@ export const createBooking = async (bookingData, token) => {
 
 export const getBookingsByUser = async ({ page, limit }, token) => {
     try {
-        console.log("getBookingsByUser page:", page);
-        console.log("getBookingsByUser limit:", limit);
         const response = await API.post(
             "/booking/get_by_user",
             { page, limit },
@@ -35,6 +33,42 @@ export const getBookingsByUser = async ({ page, limit }, token) => {
         return response.data;
     } catch (error) {
         console.error("Error fetching bookings by user:", error);
+        throw error;
+    }
+}
+
+export const getallBookings = async ({ page, limit }, token) => {
+    try {
+        const response = await API.post(
+            "/booking/all_bookings",
+            { page, limit },
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            }
+        );
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching all bookings:", error);
+        throw error;
+    }
+}
+
+export const getmaidviseBookings = async ({ maidId}, token) => {
+    try {
+        const response = await API.post(
+            "/booking/get_by_maid",
+            {  maidId},
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            }
+        );
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching maidwise bookings:", error);
         throw error;
     }
 }

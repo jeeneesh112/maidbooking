@@ -31,6 +31,7 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { useDispatch, useSelector } from "react-redux";
+import { useLocation } from "react-router-dom";
 import dayjs from "dayjs";
 import {
   createBooking,
@@ -46,17 +47,9 @@ const intialBookingData = {
 };
 
 const BookMaid = () => {
-  // const { userData } = useSelector((state) => state.profile);
   const { maids } = useSelector((state) => state.maid);
 
   const [bookingData, setBookingData] = useState(intialBookingData);
-  // const [formData, setFormData] = useState({
-  //   maidId: "",
-  //   durationMonths: "",
-  //   startDate: "",
-  //   services: [],
-  //   availability: "",
-  // });
 
   const [modalOpen, setModalOpen] = useState(false);
   const [snackbar, setSnackbar] = useState({ open: false, message: "" });
@@ -66,6 +59,7 @@ const BookMaid = () => {
   const [limit, setLimit] = useState(10);
   const { bookings, loading, error } = useSelector((state) => state.booking);
   const { token } = useSelector((state) => state.auth);
+  const location = useLocation();
 
   const fetchuserBookings = useCallback(() => {
     dispatch(
@@ -80,7 +74,7 @@ const BookMaid = () => {
     if (token) {
       fetchuserBookings();
     }
-  }, [token, fetchuserBookings]);
+  }, [token, fetchuserBookings, location.pathname]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -177,7 +171,7 @@ const BookMaid = () => {
         ) : (
           <TableContainer>
             <Table>
-            <TableHead sx={{ backgroundColor: "#fff3e0" }}>
+              <TableHead sx={{ backgroundColor: "#fff3e0" }}>
                 <TableRow>
                   <TableCell>Maid</TableCell>
                   <TableCell>Availability</TableCell>
@@ -204,8 +198,10 @@ const BookMaid = () => {
                       console.log("booking:", booking),
                       (
                         <TableRow key={booking._id}>
-                          <TableCell>{booking.maidName || "N/A"}</TableCell>
-                          <TableCell>{booking.availability}</TableCell>
+                          <TableCell>
+                            {booking?.maidDetails?.name || "N/A"}
+                          </TableCell>
+                          <TableCell>{booking?.availability}</TableCell>
                           <TableCell>
                             {booking.services?.length > 0 ? (
                               <div
@@ -274,7 +270,7 @@ const BookMaid = () => {
                 )}
               </TableBody>
             </Table>
-              <TablePagination
+            <TablePagination
               component="div"
               count={maids?.length || 0}
               page={page - 1}

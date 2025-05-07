@@ -74,7 +74,7 @@ const App = () => {
             <Route path="/admin/maids/edit/:maidId" element={<EditMaid />} />
           </Route>
 
-            <Route element={<PrivateRoute allowedRoles={["book_maid"]} />}>
+            <Route>
             <Route path="/book-maid" element={<BookMaid />} />
             </Route>
 

@@ -37,7 +37,7 @@ const maidSchema = new mongoose.Schema(
     status: {
       type: String,
       required: true,
-      enum: ["available", "assigned"],
+      enum: ["available", "in-progress", "completed"],
       default: "available",
     },
     availability: {
