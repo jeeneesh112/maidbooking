@@ -3,7 +3,7 @@ import Maid from "../models/Maid.mjs";
 import mongoose from "mongoose";
 
 export const bookMaid = async (req, res) => {
-  const { maidId, startDate, availability, services, durationMonths } =
+  const { maidId, startDate, availability, services, durationMonths, street, city,state, country, pincode } =
     req.body;
   console.log("Booking request body:", req.body);
   const userId = req.user.id;

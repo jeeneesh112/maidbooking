@@ -54,9 +54,14 @@ const DetailCard = ({ icon, title, value }) => (
     elevation={0}
     sx={{
       p: 2,
-      height: "100%",
-      backgroundColor: "#fff9f0",
+      height: "80px", // Fixed height
+      minWidth: "80px", // Minimum width
+      backgroundColor: "white",
       borderRadius: 2,
+      boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
+      display: "flex",
+      flexDirection: "column",
+      justifyContent: "space-between",
     }}
   >
     <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
@@ -64,7 +69,7 @@ const DetailCard = ({ icon, title, value }) => (
       <Typography
         variant="subtitle2"
         sx={{
-          color: "#5d4037",
+          color: "black",
           fontWeight: "medium",
           ml: 1,
         }}
@@ -72,7 +77,18 @@ const DetailCard = ({ icon, title, value }) => (
         {title}
       </Typography>
     </Box>
-    <Typography variant="body2" sx={{ color: "#8d6e63" }}>
+    <Typography
+      variant="body2"
+      sx={{
+        color: "black",
+        wordBreak: "break-word", // Handle long text
+        overflow: "hidden",
+        textOverflow: "ellipsis",
+        display: "-webkit-box",
+        WebkitLineClamp: 2, // Limit to 2 lines
+        WebkitBoxOrient: "vertical",
+      }}
+    >
       {value}
     </Typography>
   </Paper>
@@ -118,13 +134,15 @@ const ManageBookings = () => {
       );
       const maidBookingsData = result.payload.bookings || [];
       const activeBookings = maidBookingsData.filter(
-        (b) => b.status === "confirmed"
+        (b) =>
+          (b.status === "confirmed" || b.status === "in-progress") &&
+          booking.startDate <= b.endDate &&
+          booking.endDate >= b.startDate
       );
 
       const maidprofile = maidBookingsData[0]?.maidDetails;
 
       const isAvailable = activeBookings.length < 3;
-      // setMaidBookings(maidBookingsData);
       setMaidAvailability({
         isAvailable,
         activeCount: activeBookings.length,
@@ -330,7 +348,7 @@ const ManageBookings = () => {
         fullWidth
         PaperProps={{
           sx: {
-            backgroundColor: "#fffdf5",
+            backgroundColor: "red",
             borderRadius: 3,
             boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)",
           },
@@ -338,8 +356,8 @@ const ManageBookings = () => {
       >
         <DialogTitle
           sx={{
-            backgroundColor: "#fff3e0",
-            borderBottom: "1px solid #ffe0b2",
+            backgroundColor: "white",
+            borderBottom: "2px solid #FFA000",
             py: 2,
             px: 3,
           }}
@@ -352,7 +370,7 @@ const ManageBookings = () => {
             <Typography
               variant="h6"
               sx={{
-                color: "#5d4037",
+                color: "black",
                 fontWeight: "bold",
               }}
             >
@@ -361,7 +379,7 @@ const ManageBookings = () => {
             <IconButton
               onClick={() => setOpenDialog(false)}
               sx={{
-                color: "#5d4037",
+                color: "black",
                 "&:hover": {
                   backgroundColor: "rgba(93, 64, 55, 0.1)",
                 },
@@ -375,7 +393,7 @@ const ManageBookings = () => {
         <DialogContent
           dividers
           sx={{
-            backgroundColor: "#fffdf5",
+            backgroundColor: "white",
             p: 0,
           }}
         >
@@ -387,13 +405,13 @@ const ManageBookings = () => {
                 xs={12}
                 md={4}
                 sx={{
-                  backgroundColor: "#fff9f0",
+                  backgroundColor: "white",
                   p: 3,
                   borderRight: { md: "1px solid #ffe0b2" },
-                  display: "flex", // Make the container flex
-                  flexDirection: "row", // Arrange children horizontally
-                  gap: 2, // Space between sections
-                  overflowX: "auto", // Allow horizontal scrolling if needed
+                  display: "flex",
+                  flexDirection: "row",
+                  gap: 2,
+                  overflowX: "auto",
                 }}
               >
                 {/* Profile Section */}
@@ -402,18 +420,22 @@ const ManageBookings = () => {
                     display: "flex",
                     alignItems: "center",
                     gap: 2,
-                    minWidth: 300, // Minimum width for profile section
-                    flexShrink: 0, // Prevent shrinking
+                    minWidth: 300,
+                    flexShrink: 0,
+                    backgroundColor: "white",
+                    boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
                   }}
                 >
                   <Avatar
                     src={maidAvailability.maidDetails?.picture}
                     sx={{
-                      width: 80,
-                      height: 80,
-                      border: "3px solid #ffe0b2",
-                      fontSize: "2.5rem",
-                      backgroundColor: "#5d4037",
+                      width: 70,
+                      height: 70,
+                      border: "2px solid black",
+                      fontSize: "2.3rem",
+                      backgroundColor: "white",
+                      color: "black",
+                      marginLeft : 2,
                     }}
                   >
                     {!maidAvailability.maidDetails?.picture &&
@@ -424,24 +446,24 @@ const ManageBookings = () => {
                   <Box>
                     <Typography
                       variant="subtitle1"
-                      sx={{ color: "#5d4037", fontWeight: "bold" }}
+                      sx={{ color: "black", fontWeight: "bold" }}
                     >
                       {maidAvailability.maidDetails?.name}
                     </Typography>
                     <Typography
                       variant="body2"
-                      sx={{ color: "#8d6e63", mb: 0.5 }}
+                      sx={{ color: "black", mb: 0.5 }}
                     >
                       {maidAvailability.maidDetails?.area},{" "}
                       {maidAvailability.maidDetails?.city}
                     </Typography>
                     <Chip
-                      icon={<PhoneIcon fontSize="small" />}
+                      icon={<PhoneIcon fontSize="small" color="black"/>}
                       label={maidAvailability.maidDetails?.mobile}
                       size="small"
                       sx={{
-                        backgroundColor: "rgba(255, 224, 178, 0.3)",
-                        color: "#5d4037",
+                        backgroundColor: "#ffb74d",
+                        color: "black",
                       }}
                     />
                   </Box>
@@ -453,24 +475,25 @@ const ManageBookings = () => {
                   sx={{
                     p: 2,
                     minWidth: 200,
-                    backgroundColor: "rgba(255, 224, 178, 0.2)",
+                    backgroundColor: "white",
                     borderRadius: 2,
                     flexShrink: 0,
+                    boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
                   }}
                 >
                   <Typography
                     variant="subtitle2"
-                    sx={{ color: "#5d4037", fontWeight: "bold", mb: 1 }}
+                    sx={{ color: "black", fontWeight: "bold", mb: 1 }}
                   >
                     Maid Information
                   </Typography>
                   <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
                     <CurrencyRupeeIcon
-                      color="primary"
+                      color="black"
                       fontSize="small"
                       sx={{ mr: 1 }}
                     />
-                    <Typography variant="body2" sx={{ color: "#5d4037" }}>
+                    <Typography variant="body2" sx={{ color: "black" }}>
                       ₹
                       {maidAvailability.maidDetails?.salaryPerMonth?.toLocaleString(
                         "en-IN"
@@ -479,8 +502,8 @@ const ManageBookings = () => {
                     </Typography>
                   </Box>
                   <Box sx={{ display: "flex", alignItems: "center" }}>
-                    <WorkIcon color="primary" fontSize="small" sx={{ mr: 1 }} />
-                    <Typography variant="body2" sx={{ color: "#5d4037" }}>
+                    <WorkIcon color="black" fontSize="small" sx={{ mr: 1 }} />
+                    <Typography variant="body2" sx={{ color: "black" }}>
                       {maidAvailability.maidDetails?.experience || "N/A"}
                     </Typography>
                   </Box>
@@ -492,9 +515,11 @@ const ManageBookings = () => {
                   sx={{
                     p: 2,
                     minWidth: 200,
-                    backgroundColor: maidAvailability.isAvailable
-                      ? "rgba(233, 245, 233, 0.5)"
-                      : "rgba(255, 235, 238, 0.5)",
+                    // backgroundColor: maidAvailability.isAvailable
+                    //   ? "rgba(76, 175, 80, 0.2)"
+                    //   : "rgba(244, 67, 54, 0.2)",
+                    backgroundColor: "white",
+                    boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
                     borderLeft: `3px solid ${
                       maidAvailability.isAvailable ? "#7cb342" : "#e53935"
                     }`,
@@ -504,7 +529,7 @@ const ManageBookings = () => {
                 >
                   <Typography
                     variant="subtitle2"
-                    sx={{ color: "#5d4037", fontWeight: "bold", mb: 1 }}
+                    sx={{ color: "black", fontWeight: "bold", mb: 1 }}
                   >
                     Availability
                   </Typography>
@@ -531,7 +556,7 @@ const ManageBookings = () => {
                       {maidAvailability.isAvailable ? "Available" : "Booked"}
                     </Typography>
                   </Box>
-                  <Typography variant="body2" sx={{ color: "#5d4037" }}>
+                  <Typography variant="body2" sx={{ color: "black" }}>
                     {maidAvailability.activeCount}/3 slots filled
                   </Typography>
                 </Paper>
@@ -542,14 +567,15 @@ const ManageBookings = () => {
                   sx={{
                     p: 2,
                     minWidth: 200,
-                    backgroundColor: "rgba(255, 224, 178, 0.2)",
+                    backgroundColor: "white",
+                    boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
                     borderRadius: 2,
                     flexShrink: 0,
                   }}
                 >
                   <Typography
                     variant="subtitle2"
-                    sx={{ color: "#5d4037", fontWeight: "bold", mb: 1 }}
+                    sx={{ color: "black", fontWeight: "bold", mb: 1 }}
                   >
                     Services
                   </Typography>
@@ -565,7 +591,7 @@ const ManageBookings = () => {
                           size="small"
                           sx={{
                             backgroundColor: "#ffe0b2",
-                            color: "#5d4037",
+                            color: "black",
                             whiteSpace: "nowrap",
                           }}
                         />
@@ -587,21 +613,22 @@ const ManageBookings = () => {
                   sx={{
                     p: 2,
                     mb: 3,
-                    backgroundColor: "#fff9f0",
+                    backgroundColor: "white",
+                    boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.2)",
                     borderRadius: 2,
                   }}
                 >
                   <Typography
                     variant="h6"
                     sx={{
-                      color: "#5d4037",
+                      color: "black",
                       fontWeight: "bold",
                       mb: 2,
                       display: "flex",
                       alignItems: "center",
                     }}
                   >
-                    <AssignmentIcon color="primary" sx={{ mr: 1 }} />
+                    <AssignmentIcon color="black" sx={{ mr: 1 }} />
                     Current Bookings
                   </Typography>
 
@@ -614,9 +641,11 @@ const ManageBookings = () => {
                             py: 1.5,
                             px: 2,
                             mb: 1,
-                            backgroundColor: "#fff",
+                            backgroundColor: "white",
                             borderRadius: 1,
                             borderLeft: "3px solid #ffb74d",
+                            boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
+                            // border : "2px solid #ffb74d",
                           }}
                         >
                           <ListItemAvatar>
@@ -634,7 +663,7 @@ const ManageBookings = () => {
                             primary={
                               <Typography
                                 variant="subtitle2"
-                                sx={{ color: "#5d4037" }}
+                                sx={{ color: "black" }}
                               >
                                 {booking.userDetails?.name}
                               </Typography>
@@ -643,7 +672,7 @@ const ManageBookings = () => {
                               <>
                                 <Typography
                                   variant="caption"
-                                  sx={{ color: "#8d6e63", display: "block" }}
+                                  sx={{ color: "black", display: "block" }}
                                 >
                                   {dayjs(booking.startDate).format(
                                     "DD MMM YYYY"
@@ -658,16 +687,16 @@ const ManageBookings = () => {
                                     mt: 0.5,
                                     backgroundColor:
                                       booking.status === "available"
-                                        ? "#e8f5e9" // Light green for available
+                                        ? "#e8f5e9"
                                         : booking.status === "in-progress"
-                                        ? "#fff3e0" // Light amber/orange for in-progress
-                                        : "#e8eaf6", // Light indigo for completed
+                                        ? "#fff3e0"
+                                        : "#e8eaf6",
                                     color:
                                       booking.status === "available"
-                                        ? "#2e7d32" // Dark green text
+                                        ? "#2e7d32"
                                         : booking.status === "in-progress"
-                                        ? "#ff6f00" // Amber text
-                                        : "#3949ab", // Indigo text
+                                        ? "#ff6f00"
+                                        : "#3949ab",
                                     fontWeight: "medium",
                                     textTransform: "capitalize",
                                     border: "1px solid",
@@ -690,59 +719,73 @@ const ManageBookings = () => {
                       sx={{
                         p: 2,
                         textAlign: "center",
-                        backgroundColor: "#fff",
+                        backgroundColor: "white",
+                        border: "1px dashed #ffe0b2",
                         borderRadius: 1,
                       }}
                     >
-                      <Typography variant="body2" sx={{ color: "#8d6e63" }}>
+                      <Typography variant="body2" sx={{ color: "black" }}>
                         No active bookings currently
                       </Typography>
                     </Box>
                   )}
                 </Paper>
 
-                <Divider
+                {/* <Divider
                   sx={{
                     my: 2,
-                    borderColor: "#ffe0b2",
+                    borderColor: "#ffb74d",
                     borderWidth: 1,
                   }}
-                />
+                /> */}
 
                 {/* Requested Booking Section */}
+                <Paper
+                  elevation={0}
+                  sx={{
+                    p: 2,
+                    mb: 3,
+                    backgroundColor: "white",
+                    boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.2)",
+                    borderRadius: 2,
+                  }}
+                >
                 <Box>
                   <Typography
                     variant="h6"
                     sx={{
-                      color: "#5d4037",
+                      color: "black",
                       fontWeight: "bold",
                       mb: 2,
                       display: "flex",
                       alignItems: "center",
                     }}
                   >
-                    <EventNoteIcon color="primary" sx={{ mr: 1 }} />
+                    <EventNoteIcon color="black" sx={{ mr: 1 }} />
                     Requested Booking Details
                   </Typography>
 
                   <Grid container spacing={2}>
+                    {/* First Row - Full width boxes */}
                     <Grid item xs={12} sm={6}>
                       <DetailCard
-                        icon={<PersonIcon color="primary" />}
+                        icon={<PersonIcon color="black" />}
                         title="Customer"
                         value={selectedBooking.userDetails?.name}
                       />
                     </Grid>
                     <Grid item xs={12} sm={6}>
                       <DetailCard
-                        icon={<PhoneIcon color="primary" />}
+                        icon={<PhoneIcon color="black" />}
                         title="Mobile"
                         value={selectedBooking.userDetails?.mobile}
                       />
                     </Grid>
+
+                    {/* Second Row - Spaced boxes */}
                     <Grid item xs={12} sm={6}>
                       <DetailCard
-                        icon={<EventAvailableIcon color="primary" />}
+                        icon={<EventAvailableIcon color="black" />}
                         title="Start Date"
                         value={dayjs(selectedBooking.startDate).format(
                           "DD MMM YYYY"
@@ -751,68 +794,43 @@ const ManageBookings = () => {
                     </Grid>
                     <Grid item xs={12} sm={6}>
                       <DetailCard
-                        icon={<EventBusyIcon color="primary" />}
+                        icon={<EventBusyIcon color="black" />}
                         title="End Date"
                         value={dayjs(selectedBooking.endDate).format(
                           "DD MMM YYYY"
                         )}
                       />
                     </Grid>
+
+                    {/* Third Row - Spaced boxes */}
                     <Grid item xs={12} sm={6}>
                       <DetailCard
-                        icon={<CalendarTodayIcon color="primary" />}
+                        icon={<CalendarTodayIcon color="black" />}
                         title="Duration"
                         value={`${selectedBooking.durationMonths} months`}
                       />
                     </Grid>
                     <Grid item xs={12} sm={6}>
                       <DetailCard
-                        icon={<CurrencyRupeeIcon color="primary" />}
+                        icon={<CurrencyRupeeIcon color="black" />}
                         title="Total Amount"
                         value={`₹${selectedBooking.totalAmount?.toLocaleString(
                           "en-IN"
                         )}`}
                       />
                     </Grid>
+
+                    {/* Services - Full width at bottom */}
                     <Grid item xs={12}>
-                      <Paper
-                        elevation={0}
-                        sx={{
-                          p: 2,
-                          backgroundColor: "#fff9f0",
-                          borderRadius: 2,
-                        }}
-                      >
-                        <Typography
-                          variant="subtitle2"
-                          sx={{
-                            color: "#5d4037",
-                            fontWeight: "medium",
-                            mb: 1,
-                            display: "flex",
-                            alignItems: "center",
-                          }}
-                        >
-                          <BuildIcon color="primary" sx={{ mr: 1 }} />
-                          Services Requested
-                        </Typography>
-                        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
-                          {selectedBooking.services?.map((service, index) => (
-                            <Chip
-                              key={index}
-                              label={service}
-                              size="small"
-                              sx={{
-                                backgroundColor: "#ffe0b2",
-                                color: "#5d4037",
-                              }}
-                            />
-                          ))}
-                        </Box>
-                      </Paper>
+                      <DetailCard
+                        icon={<BuildIcon color="black" />}
+                        title="Services"
+                        value={selectedBooking.services?.join(", ") || "N/A"}
+                      />
                     </Grid>
                   </Grid>
                 </Box>
+                </Paper>
               </Grid>
             </Grid>
           )}
@@ -820,10 +838,11 @@ const ManageBookings = () => {
 
         <DialogActions
           sx={{
-            backgroundColor: "#fff3e0",
+            backgroundColor: "white",
+            // boxShadow: "0px -2px 4px rgba(0, 0, 0, 0.1)",
             px: 3,
             py: 2,
-            borderTop: "1px solid #ffe0b2",
+            borderTop: "1px solid #ffb74d",
           }}
         >
           <Button

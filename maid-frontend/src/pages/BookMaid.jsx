@@ -28,8 +28,11 @@ import {
   Chip,
   CircularProgress,
   TablePagination,
+  InputAdornment,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
+import SendIcon from "@mui/icons-material/Send";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
 import dayjs from "dayjs";
@@ -44,6 +47,11 @@ const intialBookingData = {
   startDate: "",
   services: [],
   availability: "",
+  street: "",
+  city: "",
+  state: "",
+  country: "",
+  pincode: "",
 };
 
 const BookMaid = () => {
@@ -287,191 +295,471 @@ const BookMaid = () => {
         )}
       </Paper>
 
-      <Dialog
+      {/* <Dialog
         open={modalOpen}
         onClose={() => setModalOpen(false)}
         fullWidth
         maxWidth="md"
-        sx={{ borderRadius: 3, boxShadow: "0 4px 20px rgba(0,0,0,0.1)" }}
+        sx={{
+          "& .MuiPaper-root": {
+            borderRadius: 3,
+            boxShadow: "0 8px 32px rgba(0,0,0,0.12)",
+            background: "linear-gradient(to bottom, #ffffff, #f8fafc)",
+            overflow: "hidden",
+          },
+        }}
       >
-        <DialogContent sx={{ p: { xs: 3, sm: 4 } }}>
-          <Box textAlign="center" mb={3}>
+        <Box
+          sx={{
+            background: "#FFA000",
+            height: 6,
+            width: "100%",
+          }}
+        />
+
+        <DialogContent
+          sx={{
+            p: { xs: 3, sm: 4 },
+            "&::-webkit-scrollbar": {
+              width: 6,
+            },
+            "&::-webkit-scrollbar-thumb": {
+              backgroundColor: "#FFA000",
+              // borderRadius: 3,
+            },
+          }}
+        >
+          <Box textAlign="center" mb={4}>
             <Typography
-              variant="h5"
-              sx={{ fontWeight: 600, color: "#2d3748", mb: 1 }}
+              variant="h4"
+              sx={{
+                fontWeight: 700,
+                color: "#2d3748",
+                mb: 1,
+                letterSpacing: -0.5,
+                position: "relative",
+                display: "inline-block",
+                "&:after": {
+                  content: '""',
+                  position: "absolute",
+                  bottom: -8,
+                  left: "50%",
+                  transform: "translateX(-50%)",
+                  width: 60,
+                  height: 4,
+                  background: "#FFA000",
+                  // borderRadius: 2,
+                },
+              }}
             >
               Book New Maid
             </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Fill in the details to book your preferred maid
+            </Typography>
           </Box>
-          <Divider
-            sx={{ borderBottomWidth: 2, borderColor: "#FFA000", mb: 3 }}
-          />
 
           <form onSubmit={handleSubmit}>
             <Grid container spacing={3}>
-              {/* Availability Selection (unchanged) */}
-              <Grid item xs={12}>
-                <FormControl component="fieldset" fullWidth>
-                  <FormLabel component="legend" required>
-                    Select Availability
-                  </FormLabel>
-                  <RadioGroup
-                    row
-                    name="availability"
-                    value={bookingData.availability}
-                    onChange={handleChange}
-                  >
-                    <FormControlLabel
-                      value="morning"
-                      control={<Radio />}
-                      label="Morning"
-                    />
-                    <FormControlLabel
-                      value="night"
-                      control={<Radio />}
-                      label="Night"
-                    />
-                    <FormControlLabel
-                      value="full-day"
-                      control={<Radio />}
-                      label="Full Day"
-                    />
-                  </RadioGroup>
-                </FormControl>
-              </Grid>
-
-              {/* Updated Service Selection */}
-              <Grid item xs={12}>
-                <FormControl component="fieldset" fullWidth>
-                  <FormLabel component="legend" required>
-                    Select Required Services
-                  </FormLabel>
-                  <FormGroup row>
-                    {[
-                      "clothes cleaning",
-                      "floor cleaning",
-                      "utensils cleaning",
-                      "cooking",
-                      "baby care",
-                    ].map((serviceName) => (
-                      <FormControlLabel
-                        key={serviceName}
-                        control={
-                          <Checkbox
-                            checked={bookingData.services.includes(serviceName)}
-                            onChange={(e) =>
-                              handleServiceChange(e, serviceName)
+              {/* Availability Selection */}
+      {/* <Grid item xs={12}>
+                <Paper
+                  elevation={0}
+                  sx={{ p: 2.5, borderRadius: 2, border: "1px solid #e2e8f0" }}
+                >
+                  <FormControl component="fieldset" fullWidth>
+                    <FormLabel
+                      component="legend"
+                      sx={{
+                        fontWeight: 600,
+                        color: "#2d3748",
+                        mb: 1.5,
+                        fontSize: "0.95rem",
+                      }}
+                    >
+                      Select Availability
+                    </FormLabel>
+                    <RadioGroup
+                      row
+                      name="availability"
+                      value={bookingData.availability}
+                      onChange={handleChange}
+                      sx={{ gap: 2 }}
+                    >
+                      {[
+                        { value: "morning", label: "Morning" },
+                        { value: "night", label: "Night" },
+                        { value: "full-day", label: "Full Day" },
+                      ].map((option) => (
+                        <Paper
+                          key={option.value}
+                          elevation={0}
+                          sx={{
+                            p: 1.5,
+                            borderRadius: 2,
+                            flex: 1,
+                            border: "1px solid",
+                            borderColor:
+                              bookingData.availability === option.value
+                                ? "#FFA000"
+                                : "#e2e8f0",
+                            backgroundColor:
+                              bookingData.availability === option.value
+                                ? "#fff8f0"
+                                : "#f8fafc",
+                            transition: "all 0.2s ease",
+                            "&:hover": {
+                              borderColor: "#FFA000",
+                            },
+                          }}
+                        >
+                          <FormControlLabel
+                            value={option.value}
+                            control={
+                              <Radio
+                                sx={{
+                                  color: "#e2e8f0",
+                                  "&.Mui-checked": {
+                                    color: "#FFA000",
+                                  },
+                                }}
+                              />
                             }
+                            label={option.label}
+                            sx={{
+                              width: "100%",
+                              m: 0,
+                              "& .MuiFormControlLabel-label": {
+                                fontWeight: 500,
+                                color: "#2d3748",
+                              },
+                            }}
+                            onClick={(e) => e.stopPropagation()}
                           />
-                        }
-                        label={serviceName}
-                      />
-                    ))}
-                  </FormGroup>
-                </FormControl>
-              </Grid>
+                        </Paper>
+                      ))}
+                    </RadioGroup>
+                  </FormControl>
+                </Paper>
+              </Grid> */}
 
-              {/* Maid Selection with Updated Filtering */}
-              {bookingData.availability && (
+      {/* Service Selection */}
+      {/* <Grid item xs={12}>
+                <Paper
+                  elevation={0}
+                  sx={{ p: 2.5, borderRadius: 2, border: "1px solid #e2e8f0" }}
+                >
+                  <FormControl component="fieldset" fullWidth>
+                    <FormLabel
+                      component="legend"
+                      sx={{
+                        fontWeight: 600,
+                        color: "#2d3748",
+                        mb: 1.5,
+                        fontSize: "0.95rem",
+                      }}
+                    >
+                      Select Required Services
+                    </FormLabel>
+                    <Grid container spacing={1.5}>
+                      {[
+                        "clothes cleaning",
+                        "floor cleaning",
+                        "utensils cleaning",
+                        "cooking",
+                        "baby care",
+                      ].map((serviceName) => (
+                        <Grid item xs={12} sm={6} md={4} key={serviceName}>
+                          <Paper
+                            elevation={0}
+                            sx={{
+                              p: 1.5,
+                              borderRadius: 1.5,
+                              border: "1px solid",
+                              borderColor: bookingData.services.includes(
+                                serviceName
+                              )
+                                ? "#FFA000"
+                                : "#e2e8f0",
+                              backgroundColor: bookingData.services.includes(
+                                serviceName
+                              )
+                                ? "#fff8f0"
+                                : "#f8fafc",
+                              transition: "all 0.2s ease",
+                              "&:hover": {
+                                borderColor: "#FFA000",
+                              },
+                            }}
+                          >
+                            <FormControlLabel
+                              control={
+                                <Checkbox
+                                  checked={bookingData.services.includes(
+                                    serviceName
+                                  )}
+                                  onChange={(e) =>
+                                    handleServiceChange(e, serviceName)
+                                  }
+                                  sx={{
+                                    color: "#e2e8f0",
+                                    "&.Mui-checked": {
+                                      color: "#FFA000",
+                                    },
+                                  }}
+                                />
+                              }
+                              label={
+                                <Typography
+                                  sx={{
+                                    fontWeight: 500,
+                                    color: "#2d3748",
+                                    textTransform: "capitalize",
+                                  }}
+                                >
+                                  {serviceName}
+                                </Typography>
+                              }
+                              sx={{ m: 0 }}
+                            />
+                          </Paper>
+                        </Grid>
+                      ))}
+                    </Grid>
+                  </FormControl>
+                </Paper>
+              </Grid> */}
+
+      {/* Maid Selection */}
+      {/* {bookingData.availability && (
                 <Grid item xs={12}>
+                  <Paper
+                    elevation={0}
+                    sx={{
+                      p: 2.5,
+                      borderRadius: 2,
+                      border: "1px solid #e2e8f0",
+                    }}
+                  >
+                    <TextField
+                      select
+                      fullWidth
+                      label="Select Maid"
+                      name="maidId"
+                      value={bookingData.maidId}
+                      onChange={handleChange}
+                      required
+                      variant="outlined"
+                      size="medium"
+                      SelectProps={{
+                        MenuProps: {
+                          PaperProps: {
+                            sx: {
+                              borderRadius: 2,
+                              boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
+                              mt: 1,
+                            },
+                          },
+                        },
+                      }}
+                      sx={{
+                        "& .MuiOutlinedInput-root": {
+                          borderRadius: 2,
+                          backgroundColor: "#f8fafc",
+                          "& fieldset": {
+                            borderColor: "#e2e8f0",
+                          },
+                          "&:hover fieldset": {
+                            borderColor: "#FFA000",
+                          },
+                          "&.Mui-focused fieldset": {
+                            borderColor: "#FFA000",
+                            boxShadow: "0 0 0 2px rgba(255,160,0,0.2)",
+                          },
+                        },
+                      }}
+                    >
+                      {maids
+                        ?.filter((maid) => {
+                          if (maid.availability !== bookingData.availability)
+                            return false;
+                          if (bookingData.services.length > 0) {
+                            return bookingData.services.every((serviceName) =>
+                              maid.services.some(
+                                (maidService) =>
+                                  maidService.name === serviceName
+                              )
+                            );
+                          }
+                          return true;
+                        })
+                        .map((maid) => {
+                          const totalSalary = maid.services.reduce(
+                            (sum, service) => sum + service.salary,
+                            0
+                          );
+
+                          return (
+                            <MenuItem
+                              key={maid._id}
+                              value={maid._id}
+                              sx={{
+                                py: 1.5,
+                                "&.Mui-selected": {
+                                  backgroundColor: "#fff8f0",
+                                },
+                                "&:hover": {
+                                  backgroundColor: "#fff8f0",
+                                },
+                              }}
+                            >
+                              <Box
+                                display="flex"
+                                justifyContent="space-between"
+                                width="100%"
+                                alignItems="center"
+                              >
+                                <Box>
+                                  <Typography sx={{ fontWeight: 600 }}>
+                                    {maid.name}
+                                  </Typography>
+                                  <Typography
+                                    variant="body2"
+                                    color="text.secondary"
+                                  >
+                                    {maid.experience} years experience
+                                  </Typography>
+                                </Box>
+                                <Chip
+                                  label={`₹${totalSalary.toLocaleString()}/month`}
+                                  size="small"
+                                  sx={{
+                                    backgroundColor: "#fff8f0",
+                                    color: "#FFA000",
+                                    fontWeight: 600,
+                                  }}
+                                />
+                              </Box>
+                            </MenuItem>
+                          );
+                        })}
+                    </TextField>
+                  </Paper>
+                </Grid>
+              )} */}
+
+      {/* Duration and Start Date */}
+      {/* <Grid item xs={12} sm={6}>
+                <Paper
+                  elevation={0}
+                  sx={{ p: 2.5, borderRadius: 2, border: "1px solid #e2e8f0" }}
+                >
                   <TextField
-                    select
                     fullWidth
-                    label="Select Maid"
-                    name="maidId"
-                    value={bookingData.maidId}
+                    label="Duration (months)"
+                    name="durationMonths"
+                    type="number"
+                    value={bookingData.durationMonths}
+                    onChange={handleChange}
+                    required
+                    variant="outlined"
+                    size="medium"
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <Typography variant="body2" color="text.secondary">
+                            months
+                          </Typography>
+                        </InputAdornment>
+                      ),
+                    }}
+                    sx={{
+                      "& .MuiOutlinedInput-root": {
+                        borderRadius: 2,
+                        backgroundColor: "#f8fafc",
+                        "& fieldset": {
+                          borderColor: "#e2e8f0",
+                        },
+                        "&:hover fieldset": {
+                          borderColor: "#FFA000",
+                        },
+                      },
+                    }}
+                  />
+                </Paper>
+              </Grid> */}
+
+      {/* <Grid item xs={12} sm={6}>
+                <Paper
+                  elevation={0}
+                  sx={{ p: 2.5, borderRadius: 2, border: "1px solid #e2e8f0" }}
+                >
+                  <TextField
+                    fullWidth
+                    name="startDate"
+                    type="date"
+                    value={bookingData.startDate}
                     onChange={handleChange}
                     required
                     variant="outlined"
                     size="medium"
                     sx={{
-                      borderRadius: 2,
-                      backgroundColor: "#f8fafc",
-                      height: "56px",
+                      "& .MuiOutlinedInput-root": {
+                        borderRadius: 2,
+                        backgroundColor: "#f8fafc",
+                        "& fieldset": {
+                          borderColor: "#e2e8f0",
+                        },
+                        "&:hover fieldset": {
+                          borderColor: "#FFA000",
+                        },
+                      },
                     }}
-                  >
-                    {maids
-                      ?.filter((maid) => {
-                        // First filter by availability
-                        if (maid.availability !== bookingData.availability)
-                          return false;
+                  />
+                </Paper>
+              </Grid> */}
 
-                        // Then filter by services if any are selected
-                        if (bookingData.services.length > 0) {
-                          return bookingData.services.every((serviceName) =>
-                            maid.services.some(
-                              (maidService) => maidService.name === serviceName
-                            )
-                          );
-                        }
-                        return true;
-                      })
-                      .map((maid) => {
-                        const totalSalary = maid.services.reduce(
-                          (sum, service) => sum + service.salary,
-                          0
-                        );
+      {/* Address Fields */}
+      {/* {["street", "city", "state", "country", "pincode"].map(
+                (field, index) => (
+                  <Grid item xs={12} sm={index === 0 ? 12 : 6} key={field}>
+                    <Paper
+                      elevation={0}
+                      sx={{
+                        p: 2.5,
+                        borderRadius: 2,
+                        border: "1px solid #e2e8f0",
+                      }}
+                    >
+                      <TextField
+                        fullWidth
+                        label={field.charAt(0).toUpperCase() + field.slice(1)}
+                        name={field}
+                        value={bookingData[field]}
+                        onChange={handleChange}
+                        required
+                        variant="outlined"
+                        size="medium"
+                        sx={{
+                          "& .MuiOutlinedInput-root": {
+                            borderRadius: 2,
+                            backgroundColor: "#f8fafc",
+                            "& fieldset": {
+                              borderColor: "#e2e8f0",
+                            },
+                            "&:hover fieldset": {
+                              borderColor: "#FFA000",
+                            },
+                          },
+                        }}
+                      />
+                    </Paper>
+                  </Grid>
+                )
+              )} */}
 
-                        return (
-                          <MenuItem key={maid._id} value={maid._id}>
-                            <Box
-                              display="flex"
-                              justifyContent="space-between"
-                              width="100%"
-                            >
-                              <span style={{ fontWeight: 500 }}>
-                                {maid.name}
-                              </span>
-                              <span style={{ color: "#4a5568" }}>
-                                ₹{totalSalary.toLocaleString()}/month
-                              </span>
-                            </Box>
-                          </MenuItem>
-                        );
-                      })}
-                  </TextField>
-                </Grid>
-              )}
-
-              {/* Duration and Start Date (unchanged) */}
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  fullWidth
-                  label="Duration (months)"
-                  name="durationMonths"
-                  type="number"
-                  value={bookingData.durationMonths}
-                  onChange={handleChange}
-                  required
-                  variant="outlined"
-                  size="medium"
-                  sx={{
-                    borderRadius: 2,
-                    backgroundColor: "#f8fafc",
-                    height: "56px",
-                  }}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  fullWidth
-                  name="startDate"
-                  type="date"
-                  value={bookingData.startDate}
-                  onChange={handleChange}
-                  required
-                  variant="outlined"
-                  size="medium"
-                  sx={{
-                    borderRadius: 2,
-                    backgroundColor: "#f8fafc",
-                    height: "56px",
-                  }}
-                />
-              </Grid>
-
-              {/* Updated Booking Summary */}
-              {bookingData.maidId &&
+      {/* Booking Summary */}
+      {/* {bookingData.maidId &&
                 bookingData.durationMonths &&
                 bookingData.startDate &&
                 (() => {
@@ -484,7 +772,6 @@ const BookMaid = () => {
                     "month"
                   );
 
-                  // Calculate total based on maid's services that match selected services
                   const selectedServicesSalary = maid.services
                     .filter((service) =>
                       bookingData.services.includes(service.name)
@@ -501,70 +788,142 @@ const BookMaid = () => {
                         sx={{
                           p: 3,
                           borderRadius: 2,
-                          backgroundColor: "#fff8f0",
+                          background:
+                            "linear-gradient(to right, #fff8f0, #fff)",
                           border: "1px solid #ffe8cc",
+                          boxShadow: "0 4px 12px rgba(255,160,0,0.08)",
                         }}
                       >
-                        <Typography
-                          variant="subtitle1"
-                          sx={{ fontWeight: 600, mb: 2, color: "#2d3748" }}
-                        >
-                          Booking Summary
-                        </Typography>
+                        <Box display="flex" alignItems="center" mb={2}>
+                          <ReceiptLongIcon sx={{ color: "#FFA000", mr: 1.5 }} />
+                          <Typography
+                            variant="h6"
+                            sx={{ fontWeight: 700, color: "#2d3748" }}
+                          >
+                            Booking Summary
+                          </Typography>
+                        </Box>
 
                         <Grid container spacing={2}>
-                          <Grid item xs={12} sm={6}>
+                          <Grid item xs={12} md={6}>
                             <Box mb={2}>
-                              <Typography variant="body2" color="textSecondary">
-                                Maid:
-                              </Typography>
-                              <Typography fontWeight={500}>
-                                {maid.name}
-                              </Typography>
-                            </Box>
-                            <Box mb={2}>
-                              <Typography variant="body2" color="textSecondary">
-                                Services:
-                              </Typography>
-                              <Typography fontWeight={500}>
-                                {bookingData.services.join(", ")}
-                              </Typography>
-                            </Box>
-                          </Grid>
-                          <Grid item xs={12} sm={6}>
-                            <Box mb={2}>
-                              <Typography variant="body2" color="textSecondary">
-                                Start Date:
-                              </Typography>
-                              <Typography fontWeight={500}>
-                                {start.format("DD MMM YYYY")}
-                              </Typography>
-                            </Box>
-                            <Box mb={2}>
-                              <Typography variant="body2" color="textSecondary">
-                                End Date:
-                              </Typography>
-                              <Typography fontWeight={500}>
-                                {end.format("DD MMM YYYY")}
-                              </Typography>
-                            </Box>
-                          </Grid>
-                          <Grid item xs={12}>
-                            <Divider sx={{ my: 1 }} />
-                            <Box
-                              display="flex"
-                              justifyContent="space-between"
-                              alignItems="center"
-                            >
-                              <Typography variant="body1" fontWeight={600}>
-                                Total Amount:
-                              </Typography>
                               <Typography
-                                variant="h6"
-                                fontWeight={700}
-                                color="#2d3748"
+                                variant="body2"
+                                color="text.secondary"
                               >
-                                ₹{total.toLocaleString("en-IN")}
+                                Maid Information
+                              </Typography>
+                              <Box mt={1} display="flex" alignItems="center">
+                                <Avatar
+                                  sx={{
+                                    bgcolor: "#FFA000",
+                                    width: 40,
+                                    height: 40,
+                                    mr: 1.5,
+                                  }}
+                                >
+                                  {maid.name.charAt(0)}
+                                </Avatar>
+                                <Box>
+                                  <Typography fontWeight={600}>
+                                    {maid.name}
+                                  </Typography>
+                                  <Typography
+                                    variant="body2"
+                                    color="text.secondary"
+                                  >
+                                    {maid.experience} years experience
+                                  </Typography>
+                                </Box>
+                              </Box>
+                            </Box>
+
+                            <Box mb={2}>
+                              <Typography
+                                variant="body2"
+                                color="text.secondary"
+                                mb={1}
+                              >
+                                Selected Services
+                              </Typography>
+                              <Box
+                                sx={{
+                                  display: "flex",
+                                  flexWrap: "wrap",
+                                  gap: 1,
+                                }}
+                              >
+                                {bookingData.services.map((service) => (
+                                  <Chip
+                                    key={service}
+                                    label={service}
+                                    size="small"
+                                    sx={{
+                                      backgroundColor: "#fff8f0",
+                                      color: "#FFA000",
+                                      fontWeight: 500,
+                                    }}
+                                  />
+                                ))}
+                              </Box>
+                            </Box>
+                          </Grid>
+
+                          <Grid item xs={12} md={6}>
+                            <Box mb={2}>
+                              <Typography
+                                variant="body2"
+                                color="text.secondary"
+                              >
+                                Booking Period
+                              </Typography>
+                              <Box
+                                mt={1.5}
+                                display="flex"
+                                justifyContent="space-between"
+                              >
+                                <Box>
+                                  <Typography variant="body2">
+                                    Start Date
+                                  </Typography>
+                                  <Typography fontWeight={600}>
+                                    {start.format("DD MMM YYYY")}
+                                  </Typography>
+                                </Box>
+                                <Box>
+                                  <Typography variant="body2">
+                                    End Date
+                                  </Typography>
+                                  <Typography fontWeight={600}>
+                                    {end.format("DD MMM YYYY")}
+                                  </Typography>
+                                </Box>
+                              </Box>
+                            </Box>
+
+                            <Box mt={3}>
+                              <Divider sx={{ my: 1.5 }} />
+                              <Box
+                                display="flex"
+                                justifyContent="space-between"
+                                alignItems="center"
+                              >
+                                <Typography variant="body1" fontWeight={700}>
+                                  Total Amount
+                                </Typography>
+                                <Typography
+                                  variant="h5"
+                                  fontWeight={800}
+                                  color="#2d3748"
+                                >
+                                  ₹{total.toLocaleString("en-IN")}
+                                </Typography>
+                              </Box>
+                              <Typography
+                                variant="caption"
+                                color="text.secondary"
+                              >
+                                ({bookingData.durationMonths} months service)
                               </Typography>
                             </Box>
                           </Grid>
@@ -572,22 +931,28 @@ const BookMaid = () => {
                       </Paper>
                     </Grid>
                   );
-                })()}
+                })()} */}
 
-              {/* Buttons (unchanged) */}
-              <Grid item xs={12} mt={10}>
-                <Box display="flex" justifyContent="flex-end" gap={2}>
+      {/* Buttons */}
+      {/* <Grid item xs={12} mt={4}>
+                <Box display="flex" justifyContent="space-between" gap={2}>
                   <Button
                     variant="outlined"
                     onClick={() => setModalOpen(false)}
+                    startIcon={<CloseIcon />}
                     sx={{
                       color: "#4a5568",
                       borderColor: "#e2e8f0",
                       borderRadius: 2,
-                      px: 3,
-                      py: 1,
+                      px: 4,
+                      py: 1.5,
                       textTransform: "none",
-                      fontWeight: 500,
+                      fontWeight: 600,
+                      "&:hover": {
+                        borderColor: "#FFA000",
+                        color: "#FFA000",
+                        backgroundColor: "#fff8f0",
+                      },
                     }}
                   >
                     Cancel
@@ -595,21 +960,403 @@ const BookMaid = () => {
                   <Button
                     type="submit"
                     variant="contained"
+                    endIcon={<SendIcon />}
                     sx={{
-                      backgroundColor: "#FFA000",
+                      background: "linear-gradient(to right, #FFA000, #FF8F00)",
                       color: "#fff",
-                      fontWeight: 500,
+                      fontWeight: 600,
                       px: 4,
-                      py: 1,
+                      py: 1.5,
                       borderRadius: 2,
                       textTransform: "none",
+                      boxShadow: "0 4px 12px rgba(255,160,0,0.3)",
+                      "&:hover": {
+                        background:
+                          "linear-gradient(to right, #FF8F00, #FFA000)",
+                        boxShadow: "0 6px 16px rgba(255,160,0,0.4)",
+                      },
                     }}
                   >
                     Confirm Booking
                   </Button>
                 </Box>
+              </Grid> */}
+      {/* </Grid> */}
+      {/* </form> */}
+      {/* </DialogContent> */}
+      {/* </Dialog>  */}
+
+      <Dialog
+        open={modalOpen}
+        onClose={() => {
+          setModalOpen(false);
+          setBookingData(intialBookingData);
+        }}
+        fullWidth
+        maxWidth="md"
+        sx={{
+          "& .MuiPaper-root": {
+            borderRadius: 3,
+            boxShadow: "0 8px 32px rgba(0,0,0,0.12)",
+            background: "linear-gradient(to bottom, #ffffff, #f8fafc)",
+            overflow: "hidden",
+          },
+        }}
+      >
+
+        <DialogContent
+          sx={{
+            p: { xs: 2, sm: 3 },
+            "&::-webkit-scrollbar": { width: 6 },
+            "&::-webkit-scrollbar-thumb": { backgroundColor: "#FFA000" },
+          }}
+        >
+          <Box textAlign="center" mb={3}>
+            <Typography
+              variant="h4"
+              sx={{
+                fontWeight: 500,
+                color: "#2d3748",
+                mb: 1,
+                position: "relative",
+                display: "inline-block",
+                "&:after": {
+                  content: '""',
+                  position: "absolute",
+                  bottom: -6,
+                  left: "50%",
+                  transform: "translateX(-50%)",
+                  width: "100%",
+                  height: 3,
+                  background: "#FFA000",
+                },
+              }}
+            >
+              Book New Maid
+            </Typography>
+          </Box>
+
+          <form onSubmit={handleSubmit}>
+            {/* Section 1: Availability & Services */}
+            <Paper
+              elevation={0}
+              sx={{ p: 2, mb: 2, borderRadius: 2, border: "1px solid #e2e8f0" }}
+            >
+              <Grid container spacing={2}>
+                <Grid item xs={12} md={6}>
+                  <FormControl component="fieldset" fullWidth>
+                    <FormLabel
+                      component="legend"
+                      sx={{ fontWeight: 600, color: "#2d3748", mb: 1 }}
+                    >
+                      Select Availability
+                    </FormLabel>
+                    <RadioGroup
+                      row
+                      name="availability"
+                      value={bookingData.availability}
+                      onChange={handleChange}
+                      sx={{ gap: 1 }}
+                    >
+                      {[
+                        {
+                          label: "Morning",
+                          value: "morning",
+                        },
+                        {
+                          label: "Night",
+                          value: "night",
+                        },
+                        {
+                          label: "Full Day",
+                          value: "full-day",
+                        },
+                      ].map((option) => (
+                        <FormControlLabel
+                          key={option.value}
+                          value={option.value}
+                          control={
+                            <Radio
+                              sx={{
+                                color: "#e2e8f0",
+                                "&.Mui-checked": { color: "#FFA000" },
+                              }}
+                            />
+                          }
+                          label={option.label}
+                          sx={{
+                            "& .MuiFormControlLabel-label": { fontWeight: 500 },
+                          }}
+                        />
+                      ))}
+                    </RadioGroup>
+                  </FormControl>
+                </Grid>
+
+                <Grid item xs={12} md={6}>
+                  <FormControl component="fieldset" fullWidth>
+                    <FormLabel
+                      component="legend"
+                      sx={{ fontWeight: 600, color: "#2d3748", mb: 1 }}
+                    >
+                      Select Services
+                    </FormLabel>
+                    <FormGroup row sx={{ gap: 1 }}>
+                      {[
+                        "clothes cleaning",
+                        "floor cleaning",
+                        "utensils cleaning",
+                        "cooking",
+                        "baby care",
+                      ].map((service) => (
+                        <FormControlLabel
+                          key={service.toLowerCase()}
+                          control={
+                            <Checkbox
+                              checked={bookingData.services.includes(
+                                service.toLowerCase()
+                              )}
+                              onChange={(e) =>
+                                handleServiceChange(e, service.toLowerCase())
+                              }
+                              sx={{
+                                color: "#e2e8f0",
+                                "&.Mui-checked": { color: "#FFA000" },
+                              }}
+                            />
+                          }
+                          label={service}
+                          sx={{
+                            "& .MuiFormControlLabel-label": { fontWeight: 500 },
+                          }}
+                        />
+                      ))}
+                    </FormGroup>
+                  </FormControl>
+                </Grid>
               </Grid>
-            </Grid>
+            </Paper>
+
+            {/* Section 2: Maid Selection & Details */}
+            {bookingData.availability && (
+              <Paper
+                elevation={0}
+                sx={{
+                  p: 2,
+                  mb: 2,
+                  borderRadius: 2,
+                  border: "1px solid #e2e8f0",
+                }}
+              >
+                <Grid container spacing={2}>
+                  <Grid item xs={12}>
+                    <TextField
+                      select
+                      fullWidth
+                      label="Select Maid"
+                      name="maidId"
+                      value={bookingData.maidId}
+                      onChange={handleChange}
+                      required
+                      variant="outlined"
+                      sx={{
+                        "& .MuiOutlinedInput-root": {
+                          "&:hover fieldset": { borderColor: "#FFA000" },
+                          "&.Mui-focused fieldset": { borderColor: "#FFA000" },
+                        },
+                      }}
+                    >
+                      {maids
+                        ?.filter(
+                          (maid) =>
+                            maid.availability === bookingData.availability &&
+                            (bookingData.services.length === 0 ||
+                              bookingData.services.every((serviceName) =>
+                                maid.services.some(
+                                  (maidService) =>
+                                    maidService.name === serviceName
+                                )
+                              ))
+                        )
+                        .map((maid) => {
+                          const totalSalary = maid.services
+                            .filter((s) =>
+                              bookingData.services.includes(s.name)
+                            )
+                            .reduce((sum, s) => sum + s.salary, 0);
+
+                          return (
+                            <MenuItem key={maid._id} value={maid._id}>
+                              <Box
+                                display="flex"
+                                justifyContent="space-between"
+                                width="100%"
+                              >
+                                <Box>
+                                  <Typography fontWeight={600}>
+                                    {maid.name}
+                                  </Typography>
+                                  {/* Uncomment if you want to display experience */}
+                                  {/* <Typography variant="body2" color="text.secondary">
+              {maid.experience} yrs exp
+            </Typography> */}
+                                </Box>
+                                <Typography fontWeight={600}>
+                                  ₹{totalSalary.toLocaleString()}/month
+                                </Typography>
+                              </Box>
+                            </MenuItem>
+                          );
+                        })}
+                    </TextField>
+                  </Grid>
+
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      fullWidth
+                      label="Duration (months)"
+                      name="durationMonths"
+                      type="number"
+                      value={bookingData.durationMonths}
+                      onChange={handleChange}
+                      required
+                      InputProps={{
+                        endAdornment: (
+                          <InputAdornment position="end">months</InputAdornment>
+                        ),
+                      }}
+                    />
+                  </Grid>
+
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      fullWidth
+                      name="startDate"
+                      type="date"
+                      value={bookingData.startDate}
+                      onChange={handleChange}
+                      required
+                    />
+                  </Grid>
+
+                  {["Street", "City", "State", "Country", "Pincode"].map(
+                    (field) => (
+                      <Grid
+                        item
+                        xs={12}
+                        sm={field === "Street" ? 12 : 6}
+                        key={field}
+                      >
+                        <TextField
+                          fullWidth
+                          label={field}
+                          name={field.toLowerCase()}
+                          value={bookingData[field.toLowerCase()]}
+                          onChange={handleChange}
+                          required
+                        />
+                      </Grid>
+                    )
+                  )}
+                </Grid>
+              </Paper>
+            )}
+
+            {/* Section 3: Summary */}
+            {bookingData.maidId &&
+              bookingData.durationMonths &&
+              bookingData.startDate && (
+                <Paper
+                  elevation={0}
+                  sx={{
+                    p: 2,
+                    mb: 2,
+                    borderRadius: 2,
+                    border: "1px solid #ffe8cc",
+                    backgroundColor: "#fff8f0",
+                  }}
+                >
+                  <Typography
+                    variant="subtitle1"
+                    sx={{
+                      fontWeight: 600,
+                      mb: 1,
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 1,
+                    }}
+                  >
+                    <ReceiptLongIcon fontSize="small" /> Booking Summary
+                  </Typography>
+
+                  <Box
+                    sx={{
+                      display: "grid",
+                      gridTemplateColumns: "1fr 1fr",
+                      gap: 1,
+                    }}
+                  >
+                    <Typography variant="body2">Maid:</Typography>
+                    <Typography fontWeight={500}>
+                      {maids.find((m) => m._id === bookingData.maidId)?.name}
+                    </Typography>
+
+                    <Typography variant="body2">Services:</Typography>
+                    <Typography fontWeight={500}>
+                      {bookingData.services.join(", ")}
+                    </Typography>
+
+                    <Typography variant="body2">Period:</Typography>
+                    <Typography fontWeight={500}>
+                      {dayjs(bookingData.startDate).format("DD MMM YYYY")} -{" "}
+                      {dayjs(bookingData.startDate)
+                        .add(bookingData.durationMonths, "month")
+                        .format("DD MMM YYYY")}
+                    </Typography>
+
+                    <Typography variant="body2">Total:</Typography>
+                    <Typography fontWeight={600}>
+                      ₹
+                      {(
+                        maids
+                          .find((m) => m._id === bookingData.maidId)
+                          ?.services.filter((s) =>
+                            bookingData.services.includes(s.name)
+                          ) // Only selected services
+                          .reduce((sum, s) => sum + s.salary, 0) *
+                          bookingData.durationMonths || 0
+                      ).toLocaleString()}
+                    </Typography>
+                  </Box>
+                </Paper>
+              )}
+            <Box display="flex" justifyContent="flex-end" gap={1} mt={2}>
+              <Button
+                variant="outlined"
+                onClick={() => {
+                  setModalOpen(false);
+                  setBookingData(intialBookingData);
+                }}
+                sx={{
+                  color: "#4a5568",
+                  borderColor: "#e2e8f0",
+                  "&:hover": { borderColor: "#FFA000", color: "#FFA000" },
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                variant="contained"
+                sx={{
+                  backgroundColor: "#FFA000",
+                  color: "#fff",
+                  "&:hover": { backgroundColor: "#E69100" },
+                }}
+              >
+                Confirm Booking
+              </Button>
+            </Box>
           </form>
         </DialogContent>
       </Dialog>

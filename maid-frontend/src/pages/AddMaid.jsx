@@ -331,7 +331,7 @@ const AddMaid = () => {
                                   <span style={{ marginRight: 8 }}>•</span>
                                   <span>
                                     {service.name} (₹
-                                    {service.salary.toLocaleString()})
+                                    {service?.salary?.toLocaleString()})
                                   </span>
                                 </div>
                               ))}
