@@ -101,8 +101,33 @@ export const getmaidviseBookings = createAsyncThunk(
   }
 );
 
-
-
+export const updateBookingStatus = createAsyncThunk(
+  "booking/updateBookingStatus",
+  async (bodydata, { getState, rejectWithValue }) => {
+    const { token } = getState().auth;
+    try {
+      const data = await bookingAPI.chnageBookingStatus(
+        {
+          maidId: bodydata?.maidId,
+          userId: bodydata?.userId,
+          bookingId: bodydata?.bookingId,
+          status: bodydata?.status,
+        },
+        token
+      );
+      return data;
+    } catch (err) {
+      if (err.response?.data) {
+        return rejectWithValue(
+          err.response.data.message || "Something went wrong"
+        );
+      }
+      return rejectWithValue(
+        err.message || "Network error: Please try again later"
+      );
+    }
+  }
+);
 
 const bookingSlice = createSlice({
   name: "booking",
@@ -131,32 +156,46 @@ const bookingSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-        .addCase(getBookingsByUser.pending, (state) => {
-            state.loading = true;
-            state.location = null;
-          })
-          .addCase(getBookingsByUser.fulfilled, (state, action) => {
-            state.loading = false;
-            state.bookings = action.payload.bookings;
-          })
-          .addCase(getBookingsByUser.rejected, (state, action) => {
-            state.loading = false;
-            state.error = action.error.message;
-          })
+      .addCase(getBookingsByUser.pending, (state) => {
+        state.loading = true;
+        state.location = null;
+      })
+      .addCase(getBookingsByUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.bookings = action.payload.bookings;
+      })
+      .addCase(getBookingsByUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
+      })
 
-          .addCase(getallBookings.pending, (state) => {
-            state.loading = true;
-          })
-          .addCase(getallBookings.fulfilled, (state, action) => {
-            state.loading = false;
-            state.bookings = action.payload.bookings;
-          })
-          .addCase(getallBookings.rejected, (state, action) => {
-            state.loading = false;
-            state.error = action.error.message;
-          })
+      .addCase(getallBookings.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(getallBookings.fulfilled, (state, action) => {
+        state.loading = false;
+        state.bookings = action.payload.bookings;
+      })
+      .addCase(getallBookings.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
+      })
 
-      
+      .addCase(updateBookingStatus.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+
+      .addCase(updateBookingStatus.fulfilled, (state) => {
+        state.loading = false;
+        state.bookingUpdated = true;
+      })
+
+      .addCase(updateBookingStatus.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || action.error.message;
+      })
+
       .addCase(createBooking.pending, (state) => {
         state.loading = true;
         state.error = null;

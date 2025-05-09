@@ -12,6 +12,11 @@ const bookingSchema = new mongoose.Schema(
       ref: "Maid",
       required: true,
     },
+    agentId : {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      // required: true,
+    },
     durationMonths: {
       type: Number,
       required: true,
@@ -42,10 +47,9 @@ const bookingSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["pending", "confirmed", "cancelled", "completed", "in-progress"],
+      enum: ["pending", "confirmed", "cancelled", "completed", "in-progress", "rejected"],
       default: "pending",
     },
-
     totalAmount: {
       type: Number,
       required: true,

@@ -3,13 +3,21 @@ import Maid from "../models/Maid.mjs";
 import mongoose from "mongoose";
 
 export const bookMaid = async (req, res) => {
-  const { maidId, startDate, availability, services, durationMonths, street, city,state, country, pincode } =
-    req.body;
-  console.log("Booking request body:", req.body);
+  const {
+    maidId,
+    startDate,
+    availability,
+    services,
+    durationMonths,
+    street,
+    city,
+    state,
+    country,
+    pincode,
+  } = req.body;
   const userId = req.user.id;
 
   const maid = await Maid.findById(maidId);
-  console.log("Maid found:", maid);
   if (!maid) {
     return res.status(404).json({ message: "Maid not found" });
   }
@@ -27,15 +35,22 @@ export const bookMaid = async (req, res) => {
   const bookingBody = {
     userId,
     maidId,
-    durationMonths,
+    durationMonths: Number(durationMonths),
     startDate: startingDate,
     endDate,
     totalAmount,
     availability,
     services,
+    address: {
+      street: street,
+      city: city,
+      state: state,
+      country: country,
+      pincode: pincode,
+    },
   };
 
-  console.log("Booking body:", bookingBody);
+  console.log("bookingBody",bookingBody)
 
   try {
     const data = await Booking.create(bookingBody);
@@ -46,7 +61,7 @@ export const bookMaid = async (req, res) => {
 };
 
 export const getmaidbyUser = async (req, res) => {
-  const {  page = 1, limit = 10 } = req.body;
+  const { page = 1, limit = 10 } = req.body;
   const skip = (page - 1) * limit;
 
   const userId = req.user.id;
@@ -60,9 +75,9 @@ export const getmaidbyUser = async (req, res) => {
 
   const aggregate = [
     {
-      $match: { 
+      $match: {
         userId: mongoose.Types.ObjectId(userId),
-       },
+      },
     },
     {
       $lookup: {
@@ -162,18 +177,18 @@ export const allmaidBookings = async (req, res) => {
     limit: Number(limit),
     bookings,
   });
-}
+};
 
 export const getmaidviseBookings = async (req, res) => {
-  const {maidId } = req.body;
+  const { maidId } = req.body;
 
   const total = await Booking.countDocuments();
 
   const aggregate = [
     {
-      $match: { 
+      $match: {
         maidId: mongoose.Types.ObjectId(maidId),
-       },
+      },
     },
     {
       $lookup: {
@@ -206,7 +221,7 @@ export const getmaidviseBookings = async (req, res) => {
           picture: "$maidDetails.picture",
           salaryPerMonth: "$maidDetails.salaryPerMonth",
           services: "$maidDetails.services",
-          status : "$maidDetails.status",
+          status: "$maidDetails.status",
           availability: "$maidDetails.availability",
         },
       },
@@ -220,7 +235,41 @@ export const getmaidviseBookings = async (req, res) => {
     total,
     bookings,
   });
-}
+};
 
+export const changeBookingStatus = async (req, res) => {
+  console.log("req.body",req.body)
+  const { maidId, userId, bookingId, status } = req.body;
 
+  const agentId =  req.user.id;
 
+  const bookingData = await Booking.findOne({
+    _id: bookingId,
+  });
+  if (!bookingData) {
+    return res.status(404).json({ message: "Booking Data not found" });
+  }
+  try {
+     await Booking.updateOne(
+      {
+        _id: bookingId,
+        userId: userId,
+      },
+      {
+        $set: {
+          agentId: agentId,
+          maidId: maidId,
+          status : status
+        },
+      }
+    );
+    res
+      .status(201)
+      .json({
+        message: "Booking Status updated Successfully",
+        bookingId: bookingData._id,
+      });
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error" });
+  }
+};

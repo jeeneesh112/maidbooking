@@ -27,6 +27,7 @@ import {
   ListItem,
   ListItemAvatar,
   ListItemText,
+  Alert,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { useDispatch, useSelector } from "react-redux";
@@ -34,6 +35,8 @@ import dayjs from "dayjs";
 import {
   getallBookings,
   getmaidviseBookings,
+  resetBookingState,
+  updateBookingStatus,
 } from "../features/booking/bookingSlice";
 import { useLocation } from "react-router-dom";
 import PhoneIcon from "@mui/icons-material/Phone";
@@ -97,14 +100,15 @@ const DetailCard = ({ icon, title, value }) => (
 const ManageBookings = () => {
   const [snackbar, setSnackbar] = useState({ open: false, message: "" });
   const [selectedBooking, setSelectedBooking] = useState(null);
-  // const [maidBookings, setMaidBookings] = useState([]);
   const [maidAvailability, setMaidAvailability] = useState(null);
   const [openDialog, setOpenDialog] = useState(false);
   const dispatch = useDispatch();
 
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
-  const { bookings, loading } = useSelector((state) => state.booking);
+  const { bookings, loading, bookingUpdated, error } = useSelector(
+    (state) => state.booking
+  );
   const { token } = useSelector((state) => state.auth);
   const location = useLocation();
 
@@ -126,7 +130,6 @@ const ManageBookings = () => {
   const handleRowClick = async (booking) => {
     setSelectedBooking(booking);
     try {
-      // Fetch all bookings for this maid
       const result = await dispatch(
         getmaidviseBookings({
           maidId: booking.maidId,
@@ -159,15 +162,6 @@ const ManageBookings = () => {
     }
   };
 
-  const handleApprove = () => {
-    // Implement approval logic here
-    setSnackbar({
-      open: true,
-      message: "Booking approved successfully",
-    });
-    setOpenDialog(false);
-  };
-
   const handleReject = () => {
     // Implement rejection logic here
     setSnackbar({
@@ -176,6 +170,45 @@ const ManageBookings = () => {
     });
     setOpenDialog(false);
   };
+
+  const handlebookingStatus = async (status, e) => {
+    try {
+      await dispatch(
+        updateBookingStatus({
+          id: Date.now(),
+          maidId: selectedBooking?.maidId,
+          userId: selectedBooking?.userId,
+          bookingId :selectedBooking?._id,
+          status: status,
+        })
+      );
+    } catch (error) {
+      console.error("Error creating booking:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (bookingUpdated && !loading && !error) {
+      fetchBookings();
+      setOpenDialog(false);
+      setSelectedBooking(null);
+      setMaidAvailability(null)
+      setSnackbar({
+        open: true,
+        message: "Booking updated successfully!",
+        severity: "success",
+      });
+      dispatch(resetBookingState());
+    }
+    if (error) {
+      setSnackbar({
+        open: true,
+        message: error || "Failed to update booking. Please try again.",
+        severity: "error",
+      });
+      dispatch(resetBookingState())
+    }
+  }, [bookingUpdated, loading, error, fetchBookings,dispatch]);
 
   return (
     <Box
@@ -397,6 +430,31 @@ const ManageBookings = () => {
             p: 0,
           }}
         >
+          {loading && (
+            <Box
+              sx={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: "100%",
+                height: "100%",
+                backgroundColor: "rgba(255, 255, 255, 0.7)",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                zIndex: 9999,
+              }}
+            >
+              <CircularProgress sx={{ color: "#FFA000" }} />
+            </Box>
+          )}
+
+          {error && (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {error}
+            </Alert>
+          )}
+
           {selectedBooking && maidAvailability && (
             <Grid container spacing={0}>
               {/* Maid Profile Section */}
@@ -435,7 +493,7 @@ const ManageBookings = () => {
                       fontSize: "2.3rem",
                       backgroundColor: "white",
                       color: "black",
-                      marginLeft : 2,
+                      marginLeft: 2,
                     }}
                   >
                     {!maidAvailability.maidDetails?.picture &&
@@ -458,7 +516,7 @@ const ManageBookings = () => {
                       {maidAvailability.maidDetails?.city}
                     </Typography>
                     <Chip
-                      icon={<PhoneIcon fontSize="small" color="black"/>}
+                      icon={<PhoneIcon fontSize="small" color="black" />}
                       label={maidAvailability.maidDetails?.mobile}
                       size="small"
                       sx={{
@@ -750,86 +808,86 @@ const ManageBookings = () => {
                     borderRadius: 2,
                   }}
                 >
-                <Box>
-                  <Typography
-                    variant="h6"
-                    sx={{
-                      color: "black",
-                      fontWeight: "bold",
-                      mb: 2,
-                      display: "flex",
-                      alignItems: "center",
-                    }}
-                  >
-                    <EventNoteIcon color="black" sx={{ mr: 1 }} />
-                    Requested Booking Details
-                  </Typography>
+                  <Box>
+                    <Typography
+                      variant="h6"
+                      sx={{
+                        color: "black",
+                        fontWeight: "bold",
+                        mb: 2,
+                        display: "flex",
+                        alignItems: "center",
+                      }}
+                    >
+                      <EventNoteIcon color="black" sx={{ mr: 1 }} />
+                      Requested Booking Details
+                    </Typography>
 
-                  <Grid container spacing={2}>
-                    {/* First Row - Full width boxes */}
-                    <Grid item xs={12} sm={6}>
-                      <DetailCard
-                        icon={<PersonIcon color="black" />}
-                        title="Customer"
-                        value={selectedBooking.userDetails?.name}
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                      <DetailCard
-                        icon={<PhoneIcon color="black" />}
-                        title="Mobile"
-                        value={selectedBooking.userDetails?.mobile}
-                      />
-                    </Grid>
+                    <Grid container spacing={2}>
+                      {/* First Row - Full width boxes */}
+                      <Grid item xs={12} sm={6}>
+                        <DetailCard
+                          icon={<PersonIcon color="black" />}
+                          title="Customer"
+                          value={selectedBooking.userDetails?.name}
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={6}>
+                        <DetailCard
+                          icon={<PhoneIcon color="black" />}
+                          title="Mobile"
+                          value={selectedBooking.userDetails?.mobile}
+                        />
+                      </Grid>
 
-                    {/* Second Row - Spaced boxes */}
-                    <Grid item xs={12} sm={6}>
-                      <DetailCard
-                        icon={<EventAvailableIcon color="black" />}
-                        title="Start Date"
-                        value={dayjs(selectedBooking.startDate).format(
-                          "DD MMM YYYY"
-                        )}
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                      <DetailCard
-                        icon={<EventBusyIcon color="black" />}
-                        title="End Date"
-                        value={dayjs(selectedBooking.endDate).format(
-                          "DD MMM YYYY"
-                        )}
-                      />
-                    </Grid>
+                      {/* Second Row - Spaced boxes */}
+                      <Grid item xs={12} sm={6}>
+                        <DetailCard
+                          icon={<EventAvailableIcon color="black" />}
+                          title="Start Date"
+                          value={dayjs(selectedBooking.startDate).format(
+                            "DD MMM YYYY"
+                          )}
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={6}>
+                        <DetailCard
+                          icon={<EventBusyIcon color="black" />}
+                          title="End Date"
+                          value={dayjs(selectedBooking.endDate).format(
+                            "DD MMM YYYY"
+                          )}
+                        />
+                      </Grid>
 
-                    {/* Third Row - Spaced boxes */}
-                    <Grid item xs={12} sm={6}>
-                      <DetailCard
-                        icon={<CalendarTodayIcon color="black" />}
-                        title="Duration"
-                        value={`${selectedBooking.durationMonths} months`}
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                      <DetailCard
-                        icon={<CurrencyRupeeIcon color="black" />}
-                        title="Total Amount"
-                        value={`₹${selectedBooking.totalAmount?.toLocaleString(
-                          "en-IN"
-                        )}`}
-                      />
-                    </Grid>
+                      {/* Third Row - Spaced boxes */}
+                      <Grid item xs={12} sm={6}>
+                        <DetailCard
+                          icon={<CalendarTodayIcon color="black" />}
+                          title="Duration"
+                          value={`${selectedBooking.durationMonths} months`}
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={6}>
+                        <DetailCard
+                          icon={<CurrencyRupeeIcon color="black" />}
+                          title="Total Amount"
+                          value={`₹${selectedBooking.totalAmount?.toLocaleString(
+                            "en-IN"
+                          )}`}
+                        />
+                      </Grid>
 
-                    {/* Services - Full width at bottom */}
-                    <Grid item xs={12}>
-                      <DetailCard
-                        icon={<BuildIcon color="black" />}
-                        title="Services"
-                        value={selectedBooking.services?.join(", ") || "N/A"}
-                      />
+                      {/* Services - Full width at bottom */}
+                      <Grid item xs={12}>
+                        <DetailCard
+                          icon={<BuildIcon color="black" />}
+                          title="Services"
+                          value={selectedBooking.services?.join(", ") || "N/A"}
+                        />
+                      </Grid>
                     </Grid>
-                  </Grid>
-                </Box>
+                  </Box>
                 </Paper>
               </Grid>
             </Grid>
@@ -846,7 +904,9 @@ const ManageBookings = () => {
           }}
         >
           <Button
-            onClick={handleReject}
+            onClick={()=>{
+              handlebookingStatus("rejected");
+            }}
             variant="outlined"
             startIcon={<CancelIcon />}
             sx={{
@@ -866,7 +926,9 @@ const ManageBookings = () => {
             Reject
           </Button>
           <Button
-            onClick={handleApprove}
+            onClick={() => {
+              handlebookingStatus("confirmed");
+            }}
             variant="contained"
             startIcon={<CheckCircleIcon />}
             sx={{

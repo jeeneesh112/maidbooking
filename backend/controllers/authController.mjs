@@ -56,6 +56,8 @@ export const verifyOtp = async (req, res) => {
 
     const userData = await User.findById(userId);
 
+    console.log('User Data:', userData);
+
     const user = {
         name: userData.name,
         email: userData.email,
