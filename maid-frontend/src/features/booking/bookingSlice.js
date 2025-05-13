@@ -129,6 +129,33 @@ export const updateBookingStatus = createAsyncThunk(
   }
 );
 
+export const giveRating = createAsyncThunk(
+  "booking/giveRating",
+  async (bodydata, { getState, rejectWithValue }) => {
+    const { token } = getState().auth;
+    try {
+      const data = await bookingAPI.giveRating(
+        {
+          bookingId: bodydata?.bookingId,
+          rating: bodydata?.rating,
+          review: bodydata?.review,
+        },
+        token
+      );
+      return data;
+    } catch (err) {
+      if (err.response?.data) {
+        return rejectWithValue(
+          err.response.data.message || "Something went wrong"
+        );
+      }
+      return rejectWithValue(
+        err.message || "Network error: Please try again later"
+      );
+    }
+  }
+);
+
 const bookingSlice = createSlice({
   name: "booking",
   initialState: {
@@ -192,6 +219,21 @@ const bookingSlice = createSlice({
       })
 
       .addCase(updateBookingStatus.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || action.error.message;
+      })
+
+      .addCase(giveRating.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+
+      .addCase(giveRating.fulfilled, (state) => {
+        state.loading = false;
+        state.bookingUpdated = true;
+      })
+
+      .addCase(giveRating.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || action.error.message;
       })

@@ -62,6 +62,7 @@ const BookMaid = () => {
   const [bookingData, setBookingData] = useState(intialBookingData);
 
   const [modalOpen, setModalOpen] = useState(false);
+
   const [snackbar, setSnackbar] = useState({ open: false, message: "" });
   const dispatch = useDispatch();
 
@@ -117,7 +118,6 @@ const BookMaid = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      console.log("bookingData:", bookingData);
       await dispatch(createBooking({ ...bookingData, id: Date.now() }));
     } catch (error) {
       console.error("Error creating booking:", error);

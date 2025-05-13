@@ -26,6 +26,35 @@ export const bookMaid = async (req, res) => {
   const endDate = new Date(startingDate);
   endDate.setMonth(endDate.getMonth() + durationMonths);
 
+  const existingBookings = await Booking.find({
+    maidId,
+    $or: [{ status: "confirmed" }, { status: "in-process" }],
+    $and: [{ startDate: { $lt: endDate } }, { endDate: { $gt: startingDate } }],
+  });
+
+  const hasConflict = existingBookings.some((existingBooking) => {
+    if (
+      existingBooking.availability === "full-day" ||
+      availability === "full-day"
+    ) {
+      return true;
+    }
+    return existingBooking.availability === availability;
+  });
+
+  if (hasConflict) {
+    return res.status(409).json({
+      message:
+        "Booking conflict: The maid is already booked for the requested time slot",
+      suggestion:
+        availability === "morning"
+          ? "Try booking for night instead"
+          : availability === "night"
+          ? "Try booking for morning instead"
+          : "Try different dates",
+    });
+  }
+
   const selectedServicesSalary = maid.services
     .filter((service) => services.includes(service.name))
     .reduce((sum, service) => sum + service.salary, 0);
@@ -50,7 +79,7 @@ export const bookMaid = async (req, res) => {
     },
   };
 
-  console.log("bookingBody",bookingBody)
+  console.log("bookingBody", bookingBody);
 
   try {
     const data = await Booking.create(bookingBody);
@@ -238,10 +267,9 @@ export const getmaidviseBookings = async (req, res) => {
 };
 
 export const changeBookingStatus = async (req, res) => {
-  console.log("req.body",req.body)
   const { maidId, userId, bookingId, status } = req.body;
 
-  const agentId =  req.user.id;
+  const agentId = req.user.id;
 
   const bookingData = await Booking.findOne({
     _id: bookingId,
@@ -250,7 +278,7 @@ export const changeBookingStatus = async (req, res) => {
     return res.status(404).json({ message: "Booking Data not found" });
   }
   try {
-     await Booking.updateOne(
+    await Booking.updateOne(
       {
         _id: bookingId,
         userId: userId,
@@ -259,16 +287,49 @@ export const changeBookingStatus = async (req, res) => {
         $set: {
           agentId: agentId,
           maidId: maidId,
-          status : status
+          status: status,
         },
       }
     );
-    res
-      .status(201)
-      .json({
-        message: "Booking Status updated Successfully",
-        bookingId: bookingData._id,
-      });
+    res.status(201).json({
+      message: "Booking Status updated Successfully",
+      bookingId: bookingData._id,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const giveRating = async (req, res) => {
+  const { bookingId, rating, review } = req.body;
+
+  const userId = req.user.id;
+
+  const bookingData = await Booking.findOne({
+    _id: bookingId,
+    userId: userId,
+  });
+  if (!bookingData) {
+    return res.status(404).json({ message: "Booking Data not found" });
+  }
+
+    try {
+    await Booking.updateOne(
+      {
+        _id: bookingId,
+        userId: userId,
+      },
+      {
+        $set: {
+          rating : rating,
+          review : review
+        },
+      }
+    );
+    res.status(201).json({
+      message: "Thank you for the rating",
+      bookingId: bookingData._id,
+    });
   } catch (error) {
     res.status(500).json({ message: "Internal server error" });
   }

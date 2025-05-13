@@ -93,3 +93,21 @@ export const chnageBookingStatus = async (
     throw error;
   }
 };
+
+export const giveRating = async ({ bookingId, rating, review }, token) => {
+  try {
+    const response = await API.post(
+      "/booking/give_rating",
+      { bookingId, rating, review },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error in give Booking rating:", error);
+    throw error;
+  }
+};
