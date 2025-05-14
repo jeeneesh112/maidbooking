@@ -131,6 +131,8 @@ export const getmaidbyUser = async (req, res) => {
         status: 1,
         totalAmount: 1,
         durationMonths: 1,
+        rating: 1,
+        review: 1,
         maidDetails: {
           name: "$maidDetails.name",
           area: "$maidDetails.area",
@@ -187,6 +189,8 @@ export const allmaidBookings = async (req, res) => {
         status: 1,
         totalAmount: 1,
         durationMonths: 1,
+         rating: 1,
+        review: 1,
         userDetails: {
           name: "$userDetails.name",
           mobile: "$userDetails.mobile",

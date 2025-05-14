@@ -178,7 +178,7 @@ const ManageBookings = () => {
           id: Date.now(),
           maidId: selectedBooking?.maidId,
           userId: selectedBooking?.userId,
-          bookingId :selectedBooking?._id,
+          bookingId: selectedBooking?._id,
           status: status,
         })
       );
@@ -192,7 +192,7 @@ const ManageBookings = () => {
       fetchBookings();
       setOpenDialog(false);
       setSelectedBooking(null);
-      setMaidAvailability(null)
+      setMaidAvailability(null);
       setSnackbar({
         open: true,
         message: "Booking updated successfully!",
@@ -206,9 +206,9 @@ const ManageBookings = () => {
         message: error || "Failed to update booking. Please try again.",
         severity: "error",
       });
-      dispatch(resetBookingState())
+      dispatch(resetBookingState());
     }
-  }, [bookingUpdated, loading, error, fetchBookings,dispatch]);
+  }, [bookingUpdated, loading, error, fetchBookings, dispatch]);
 
   return (
     <Box
@@ -251,21 +251,31 @@ const ManageBookings = () => {
             <Table>
               <TableHead sx={{ backgroundColor: "#fff3e0" }}>
                 <TableRow>
-                  <TableCell>Name</TableCell>
-                  <TableCell>Mobile Number</TableCell>
-                  <TableCell>Availability</TableCell>
-                  <TableCell>Services</TableCell>
-                  <TableCell>Duration (Months)</TableCell>
-                  <TableCell>Start Date</TableCell>
-                  <TableCell>End Date</TableCell>
-                  <TableCell>Total Amount (₹)</TableCell>
-                  <TableCell>Status</TableCell>
+                  <TableCell sx={{ fontWeight: "bold" }}>Name</TableCell>
+                  <TableCell sx={{ fontWeight: "bold" }}>
+                    Mobile Number
+                  </TableCell>
+                  <TableCell sx={{ fontWeight: "bold" }}>
+                    Availability
+                  </TableCell>
+                  <TableCell sx={{ fontWeight: "bold" }}>Services</TableCell>
+                  <TableCell sx={{ fontWeight: "bold" }}>
+                    Duration (Months)
+                  </TableCell>
+                  <TableCell sx={{ fontWeight: "bold" }}>Start Date</TableCell>
+                  <TableCell sx={{ fontWeight: "bold" }}>End Date</TableCell>
+                  <TableCell sx={{ fontWeight: "bold" }}>
+                    Total Amount (₹)
+                  </TableCell>
+                  <TableCell sx={{ fontWeight: "bold" }}>Status</TableCell>
+                  <TableCell sx={{ fontWeight: "bold" }}>Rating</TableCell>
+                  <TableCell sx={{ fontWeight: "bold" }}>Review</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {bookings?.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={8} align="center">
+                    <TableCell colSpan={11} align="center">
                       <Typography variant="body1" color="text.secondary">
                         No bookings yet.
                       </Typography>
@@ -279,9 +289,8 @@ const ManageBookings = () => {
                       onClick={() => handleRowClick(booking)}
                       sx={{
                         cursor: "pointer",
-                        "&:hover": {
-                          backgroundColor: "#f5f5f5",
-                        },
+                        "&:hover": { backgroundColor: "#f5f5f5" },
+                        "& > td": { verticalAlign: "top" },
                       }}
                     >
                       <TableCell>
@@ -351,6 +360,44 @@ const ManageBookings = () => {
                                 : "#721c24",
                           }}
                         />
+                      </TableCell>
+                      <TableCell>
+                        {booking.rating ? (
+                          <Chip
+                            label={booking.rating}
+                            color="primary"
+                            variant="outlined"
+                            size="small"
+                            sx={{
+                              backgroundColor: "#e3f2fd",
+                              color: "#0d47a1",
+                            }}
+                          />
+                        ) : (
+                          <Typography
+                            variant="body2"
+                            sx={{ color: "text.secondary" }}
+                          >
+                            No rating
+                          </Typography>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {booking.review ? (
+                          <Typography
+                            variant="body2"
+                            sx={{ color: "text.secondary" }}
+                          >
+                            {booking.review}
+                          </Typography>
+                        ) : (
+                          <Typography
+                            variant="body2"
+                            sx={{ color: "text.secondary" }}
+                          >
+                            No review
+                          </Typography>
+                        )}
                       </TableCell>
                     </TableRow>
                   ))
@@ -904,7 +951,7 @@ const ManageBookings = () => {
           }}
         >
           <Button
-            onClick={()=>{
+            onClick={() => {
               handlebookingStatus("rejected");
             }}
             variant="outlined"
